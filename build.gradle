@@ -13,8 +13,8 @@ plugins {
 }
 
 application {
-  mainClass = 'uk.gov.hmcts.reform.demo.Application'
-  group = 'uk.gov.hmcts.reform'
+  mainClass = 'uk.gov.hmcts.opal.logging.Application'
+  group = 'uk.gov.hmcts.opal'
   version = '0.0.1'
 }
 
@@ -102,8 +102,8 @@ tasks.check.dependsOn(integration)
 
 sonarqube {
   properties {
-    property "sonar.projectName", "Reform :: spring-boot-template"
-    property "sonar.projectKey", "uk.gov.hmcts.reform:spring-boot-template"
+    property "sonar.projectName", "HMCTS :: opal-logging-service"
+    property "sonar.projectKey", "uk.gov.hmcts:opal-logging-service"
   }
 }
 
@@ -158,7 +158,7 @@ dependencies {
 }
 
 bootJar {
-  archiveFileName = "spring-boot-template.jar"
+  archiveFileName = "opal-logging-service.jar"
 
   manifest {
     attributes('Implementation-Version': project.version.toString())

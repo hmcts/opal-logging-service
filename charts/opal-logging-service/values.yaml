@@ -1,0 +1,12 @@
+java:
+  applicationPort: 4065
+  image: 'hmctspublic.azurecr.io/opal/logging-service:latest'
+  ingressHost: opal-logging-service-{{ .Values.global.environment }}.platform.hmcts.net
+  aadIdentityName: opal
+#  Uncomment once the vault containing the app insights key has been set up
+#  keyVaults:
+#    opal:
+#      secrets:
+#        - name: AppInsightsInstrumentationKey
+#          alias: azure.application-insights.instrumentation-key
+  environment:
