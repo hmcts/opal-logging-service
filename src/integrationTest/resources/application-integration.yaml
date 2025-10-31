@@ -1,0 +1,38 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: INFO
+        type:
+          descriptor:
+            sql:
+              BasicBinder: WARN
+
+      springframework:
+        jdbc:
+          datasource:
+            init: DEBUG
+# Flyway
+flyway:
+  locations: classpath:db/migration/allEnvs, classpath:db/migration/devOnly
+  baseline-on-migrate: true
+  ignoreMigrationPatterns: "*:missing"
+
+# Hibernate
+jpa:
+  hibernate:
+    ddl-auto: validate
+  show-sql: true
+
+testcontainers:
+  reuse:
+    enable: true
