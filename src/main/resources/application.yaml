@@ -1,15 +1,17 @@
 server:
   port: 4065
   shutdown: "graceful"
-
-# If you use a database then uncomment the `group:, readiness: and include: "db"` lines in the health probes and uncomment the datasource section
+hmcts:
+  common:
+    exceptions:
+      enable-exception-handler: true
 management:
   endpoint:
     health:
       show-details: "always"
-      # group:
-      #  readiness:
-      #   include: "db"
+      group:
+        readiness:
+          include: "db"
   endpoints:
     web:
       base-path: /
@@ -25,27 +27,31 @@ spring:
     import: "optional:configtree:/mnt/secrets/opal/"
   application:
     name: Opal Logging Service
-#  datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
-#    username: ${DB_USER_NAME}
-#    password: ${DB_PASSWORD}
-#    properties:
-#      charSet: UTF-8
-#    hikari:
-#      minimumIdle: 2
-#      maximumPoolSize: 10
-#      idleTimeout: 10000
-#      poolName: {to-be-defined}HikariCP
-#      maxLifetime: 7200000
-#      connectionTimeout: 30000
-#  jpa:
-#    properties:
-#      hibernate:
-#        jdbc:
-#          lob:
-#            # silence the 'wall-of-text' - unnecessary exception throw about blob types
-#            non_contextual_creation: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${OPAL_LOGGING_DB_HOST:localhost}:${OPAL_LOGGING_DB_PORT:5432}/${OPAL_LOGGING_DB_NAME:opal-logging-db}${OPAL_LOGGING_DB_OPTIONS:}
+    username: ${OPAL_LOGGING_DB_USERNAME:opal-logging}
+    password: ${OPAL_LOGGING_DB_PASSWORD:opal-logging}
+    properties:
+      charSet: UTF-8
+    hikari:
+      minimumIdle: 2
+      maximumPoolSize: 10
+      idleTimeout: 10000
+      poolName: OpalLoggingHikariCP
+      maxLifetime: 7200000
+      connectionTimeout: 30000
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            # silence the 'wall-of-text' - unnecessary exception throw about blob types
+            non_contextual_creation: true
+  flyway:
+    locations: ${FLYWAY_LOCATIONS:classpath:db/migration/allEnvs, classpath:db/migration/devOnly, classpath:db/migration/stgOnly}
+    baseline-on-migrate: true
+    ignoreMigrationPatterns: "*:missing"
 
 azure:
   application-insights:

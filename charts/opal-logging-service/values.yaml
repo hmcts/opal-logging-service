@@ -8,4 +8,13 @@ java:
       secrets:
         - name: app-insights-connection-string
           alias: app-insights-connection-string
-  environment:
+        - name: logging-service-POSTGRES-HOST
+          alias: OPAL_LOGGING_DB_HOST
+        - name: logging-service-POSTGRES-PASS
+          alias: OPAL_LOGGING_DB_PASSWORD
+        - name: logging-service-POSTGRES-PORT
+          alias: OPAL_LOGGING_DB_PORT
+        - name: logging-service-POSTGRES-USER
+          alias: OPAL_LOGGING_DB_USERNAME
+        - name: logging-service-POSTGRES-DATABASE
+          alias: OPAL_LOGGING_DB_NAME
