@@ -24,3 +24,20 @@ services:
       - LOGBACK_REQUIRE_ERROR_CODE=false
     ports:
       - $SERVER_PORT:$SERVER_PORT
+
+  opal-logging-db:
+    container_name: opal-logging-db
+    image: postgres:17.5
+    restart: always
+    environment:
+      - POSTGRES_DB=opal-logging-db
+      - POSTGRES_USER=opal-logging
+      - POSTGRES_PASSWORD=opal-logging
+      - PGPORT=5432
+    ports:
+      - "5434:5432"
+    volumes:
+      - opal_logging_db_data:/var/lib/postgresql/data
+
+volumes:
+  opal_logging_db_data:
