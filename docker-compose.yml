@@ -27,7 +27,7 @@ services:
 
   opal-logging-db:
     container_name: opal-logging-db
-    image: postgres:17.5
+    image: postgres:17.6
     restart: always
     environment:
       - POSTGRES_DB=opal-logging-db
