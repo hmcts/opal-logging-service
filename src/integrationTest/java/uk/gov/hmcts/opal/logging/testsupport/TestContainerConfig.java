@@ -10,7 +10,7 @@ public class TestContainerConfig {
     public static final PostgreSQLContainer<?> POSTGRES_CONTAINER;
 
     static {
-        POSTGRES_CONTAINER = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17.5"))
+        POSTGRES_CONTAINER = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16.9"))
             .withDatabaseName("opal-logging-test-db")
             .withUsername("opal-logging")
             .withPassword("opal-logging")
