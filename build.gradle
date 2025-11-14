@@ -174,8 +174,6 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-testcontainers'
   testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
   testImplementation 'org.testcontainers:postgresql'
-  testImplementation 'com.h2database:h2:2.4.240'
-
 
   //Added to override dependency version to resolve vulnerability
   implementation 'org.apache.commons:commons-lang3:3.19.0'
@@ -191,6 +189,9 @@ bootJar {
 
 // Gradle 7.x issue, workaround from: https://github.com/gradle/gradle/issues/17236#issuecomment-894768083
 rootProject.tasks.named("processSmokeTestResources") {
+  duplicatesStrategy = 'include'
+}
+rootProject.tasks.named("processFunctionalTestResources") {
   duplicatesStrategy = 'include'
 }
 rootProject.tasks.named("processIntegrationTestResources") {
