@@ -3,5 +3,24 @@
   "extends": [
     "local>hmcts/.github:renovate-config",
     "local>hmcts/.github//renovate/automerge-all"
-  ]
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["postgres"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["helm"],
+      "matchPackageNames": ["postgresql", "userServicePostgresql"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["gradle-wrapper"],
+      "matchUpdateTypes": ["minor", "patch"]
+    }
+
+  ],
+  "description": "Schedule for Wednesdays only.",
+  "schedule": [ "* * * * 3" ]
 }
