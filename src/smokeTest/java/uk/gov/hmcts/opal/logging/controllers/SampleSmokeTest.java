@@ -7,14 +7,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.opal.logging.testsupport.AbstractSmokeTest;
 
 import static io.restassured.RestAssured.given;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ActiveProfiles({"h2db"})
-class SampleSmokeTest {
+class SampleSmokeTest extends AbstractSmokeTest {
     @Value("${TEST_URL:http://localhost:8080}")
     private String testUrl;
 
