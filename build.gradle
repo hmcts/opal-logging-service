@@ -176,7 +176,7 @@ dependencies {
   testImplementation 'org.testcontainers:postgresql'
 
   //Added to override dependency version to resolve vulnerability
-  implementation 'org.apache.commons:commons-lang3:3.19.0'
+  implementation 'org.apache.commons:commons-lang3:3.20.0'
 }
 
 bootJar {
