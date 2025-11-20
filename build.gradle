@@ -16,6 +16,7 @@ plugins {
     See https://github.com/hmcts/gradle-java-plugin
  */
   id 'uk.gov.hmcts.java' version '0.12.67'
+  id "org.openapi.generator" version "7.16.0"
 }
 
 application {
@@ -41,9 +42,21 @@ def configureSourceSet(String name) {
   }
 }
 
+sourceSets {
+  openapi {
+    java {
+      srcDir file('src/openApi/java')
+    }
+    resources.srcDir file('src/openApi/resources')
+  }
+}
+
 ['smokeTest', 'integrationTest', 'functionalTest'].each { configureSourceSet(it) }
 
 configurations {
+  openapiImplementation.extendsFrom implementation
+  openapiRuntimeOnly.extendsFrom runtimeOnly
+
   functionalTestImplementation.extendsFrom testImplementation
   functionalTestRuntimeOnly.extendsFrom runtimeOnly
 
@@ -53,7 +66,39 @@ configurations {
   smokeTestImplementation.extendsFrom testImplementation
   smokeTestRuntimeOnly.extendsFrom runtimeOnly
 }
+tasks.register("bundleOpenApi", JavaExec) {
+  dependsOn 'compileOpenapiJava'
+  classpath = sourceSets.openapi.runtimeClasspath
+  group = "openapi"
+  description = "Bundle multiple OpenAPI YAML files into one"
+  mainClass = 'uk.gov.hmcts.opal.openapi.OpenApiBundler'
+  args = ["$rootDir/src/main/resources/openapi", "$buildDir/openapi-bundled.yaml"]
+}
 
+openApiGenerate {
+  generatorName = "spring"
+  inputSpec = "$buildDir/openapi-bundled.yaml".toString()
+  outputDir = "$buildDir/generated/openapi".toString()
+  apiPackage = "uk.gov.hmcts.opal.generated.".toString() + "http.api"
+  modelPackage = "uk.gov.hmcts.opal.generated.".toString() + "model"
+  // Point to your customized mustache templates
+//  templateDir = "$rootDir/openapi/templates".toString()
+  generateApiTests = false
+  generateModelTests = false
+  skipOperationExample = true
+  openapiNormalizer = [
+          REF_AS_PARENT_IN_ALLOF: "true"
+  ]
+  configOptions = [
+          dateLibrary                         : "java8",
+          interfaceOnly                       : "true",
+          useTags                             : "true",
+          useSpringBoot3                      : "true",
+          containerDefaultToNull              : "true",
+          generatedConstructorWithRequiredArgs: "false",
+          useBeanValidation                   : "true",
+  ]
+}
 tasks.withType(JavaCompile).configureEach {
   options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
@@ -146,6 +191,11 @@ ext {
 ext['snakeyaml.version'] = '2.0'
 
 dependencies {
+  openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.35"
+  openapiImplementation "io.swagger.core.v3:swagger-models:2.2.40"
+  openapiImplementation "io.swagger.core.v3:swagger-core:2.2.40"
+  openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1"
+  
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -215,4 +265,11 @@ tasks.register('runAllStyleChecks') {
   dependsOn 'checkstyleTest'
   dependsOn 'checkstyleIntegrationTest'
   dependsOn 'checkstyleFunctionalTest'
+}
+
+tasks.named("openApiGenerate") {
+  dependsOn 'bundleOpenApi'
+}
+tasks.named("compileJava") {
+  dependsOn 'openApiGenerate'
 }

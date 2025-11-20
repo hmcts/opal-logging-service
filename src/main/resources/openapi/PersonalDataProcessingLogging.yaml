@@ -1,0 +1,269 @@
+openapi: 3.1.1
+info:
+  title: Opal Logging Service - Personal Data Processing APIs
+  version: "1.0.0"
+
+paths:
+  /log/pdpo:
+    post:
+      summary: Add Personal Data Processing Logging
+      description: Adds a Personal Data Processing log entry for auditing purposes.
+      tags:
+        - PersonalDataProcessingLog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPDPLRequest'
+      responses:
+        201:
+          description: Created — returns the created PersonalDataProcessingLog object (or objects).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalDataProcessingLog'
+        400:
+          description: Bad request
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+        401:
+          description: Bad request
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+        403:
+          description: Bad request
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+        500:
+          description: Internal server error
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+        503:
+          description: Service unavailable
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+
+  /test-support/search:
+    post:
+      summary: Search Personal Data Processing Logging (test-support)
+      description: Test-support endpoint used by automated tests to verify PDPO logs have been stored in the database.
+      tags:
+        - PersonalDataProcessingLog
+        - Test-Support
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchPDPLRequest'
+      responses:
+        200:
+          description: Array of PersonalDataProcessingLog objects matching the search.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonalDataProcessingLog'
+        400:
+          description: Bad request
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+        401:
+          description: Unauthorized
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+        403:
+          description: Forbidden
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+        500:
+          description: Internal server error
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+        503:
+          description: Service unavailable
+          content:
+            application/json+problem:
+              schema:
+                $ref: './common.yaml#/components/schemas/ProblemDetail'
+
+components:
+  schemas:
+    PDPLIdentifier:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Unique identifier for the user/entity.
+        type:
+          type: string
+          minLength: 1
+          maxLength: 30
+          description: Type of identifier. Examples - OPAL_USER_ID, EXTERNAL_SERVICE, DEFENDANT, MINOR_CREDITOR.
+
+    PersonalDataProcessingLog:
+      type: object
+      required:
+        - pdpo_log_id
+        - created_by
+        - created_at
+        - business_identifier_id
+        - business_identifier
+        - ip_address
+        - category
+        - individuals
+      properties:
+        pdpo_log_id:
+          type: integer
+          format: int64
+          description: The id of the PDPL request.
+        created_by:
+          $ref: '#/components/schemas/PDPLIdentifier'
+        created_at:
+          type: string
+          format: date-time
+          description: Time of the PDPO request.
+        business_identifier_id:
+          type: integer
+          format: int64
+          description: Internal business description id.
+        business_identifier:
+          type: string
+          minLength: 1
+          maxLength: 250
+          description: Human-readable business identifier/description. Reuse existing description id if present; otherwise create new one.
+        ip_address:
+          type: string
+          oneOf:
+            - format: ipv4
+            - format: ipv6
+          description: Requester's IP address (IPv4 or IPv6).
+        category:
+          type: string
+          description: Category of personal data processing.
+          enum:
+            - Collection
+            - Alteration
+            - Consultation
+            - Disclosure
+            - Combination
+            - Erasure
+        recipient:
+          $ref: '#/components/schemas/PDPLIdentifier'
+          description: Required when category = "Disclosure"; must not be present otherwise.
+        individuals:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PDPLIdentifier'
+          description: People the PDPO relates to.
+      if:
+        properties:
+          category:
+            const: Disclosure
+        then:
+          required:
+            - recipient
+    AddPDPLRequest:
+      type: object
+      required:
+        - created_by
+        - created_at
+        - business_identifier
+        - ip_address
+        - category
+        - individuals
+      properties:
+        created_by:
+          $ref: '#/components/schemas/PDPLIdentifier'
+          description: Identifier for the creator of the PDPL entry.
+        created_at:
+          type: string
+          format: date-time
+          description: Time of the PDPO request.
+        business_identifier:
+          type: string
+          minLength: 1
+          maxLength: 250
+          description: Business identifier text.
+        ip_address:
+          type: string
+          oneOf:
+            - format: ipv4
+            - format: ipv6
+          description: Requester's IP address (ipv4 or ipv6).
+        category:
+          type: string
+          enum:
+            - Collection
+            - Alteration
+            - Consultation
+            - Disclosure
+            - Combination
+            - Erasure
+        recipient:
+          $ref: '#/components/schemas/PDPLIdentifier'
+          description: Required only when category == "Disclosure".
+        individuals:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PDPLIdentifier'
+          description: People the PDPO relates to.
+      if:
+        properties:
+          category:
+            const: Disclosure
+        then:
+          required:
+            - recipient
+    SearchPDPLRequest:
+      type: object
+      properties:
+        created_by:
+          $ref: '#/components/schemas/PDPLIdentifier'
+        business_identifier:
+          type: string
+          minLength: 1
+          maxLength: 250
+        category:
+          type: string
+          enum:
+            - Collection
+            - Alteration
+            - Consultation
+            - Disclosure
+            - Combination
+            - Erasure
+
+tags:
+  - name: PersonalDataProcessingLog
+    description: Endpoints related to personal data processing logging endpoints.
+  - name: Test-Support
+    description: Test-support endpoints for use by automated tests only.
+
