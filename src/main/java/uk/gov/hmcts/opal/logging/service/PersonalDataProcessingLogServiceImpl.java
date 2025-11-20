@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import uk.gov.hmcts.opal.logging.dto.ParticipantIdentifier;
 import uk.gov.hmcts.opal.logging.dto.PersonalDataProcessingLogDetails;
 import uk.gov.hmcts.opal.logging.domain.PdpoCategory;
@@ -29,13 +28,6 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
 
     @Override
     public PdpoLogEntity recordLog(PersonalDataProcessingLogDetails details) {
-        Assert.notNull(details, "details must not be null");
-        assertParticipant(details.getCreatedBy(), "created_by");
-        Assert.hasText(details.getBusinessIdentifier(), "business_identifier is required");
-        Assert.notNull(details.getCreatedAt(), "created_at is required");
-        Assert.hasText(details.getIpAddress(), "ip_address is required");
-        Assert.notNull(details.getCategory(), "category is required");
-
         String businessIdentifierValue = normalized(details.getBusinessIdentifier());
         PdpoIdentifierEntity identifier = identifierRepository.findByBusinessIdentifier(businessIdentifierValue)
             .orElseGet(() -> identifierRepository.save(
@@ -66,7 +58,6 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
                                 PdpoLogEntity log) {
         ParticipantIdentifier recipient = details.getRecipient();
         if (category.requiresRecipient() && recipient != null) {
-            assertParticipant(recipient, "recipient");
             log.setRecipientIdentifier(normalized(recipient.getIdentifier()));
             log.setRecipientIdentifierType(resolveType(recipient));
         } else {
@@ -82,20 +73,12 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
         participants.stream()
             .filter(Objects::nonNull)
             .forEach(participant -> {
-                assertParticipant(participant, "individual");
                 PdpoLogIndividualEntity entity = PdpoLogIndividualEntity.builder()
                     .individualIdentifier(normalized(participant.getIdentifier()))
                     .individualType(resolveType(participant))
                     .build();
                 log.addIndividual(entity);
             });
-    }
-
-    private static void assertParticipant(ParticipantIdentifier identifier, String fieldName) {
-        Assert.notNull(identifier, () -> fieldName + " must be supplied");
-        Assert.hasText(identifier.getIdentifier(), () -> fieldName + ".identifier is required");
-        Assert.notNull(identifier.getType(), () -> fieldName + ".type is required");
-        Assert.hasText(identifier.getType().getType(), () -> fieldName + ".type value is required");
     }
 
     private static String resolveType(ParticipantIdentifier identifier) {
