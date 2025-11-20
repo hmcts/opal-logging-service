@@ -49,6 +49,11 @@ sourceSets {
     }
     resources.srcDir file('src/openApi/resources')
   }
+  main {
+    java {
+      srcDir "$buildDir/generated/openapi/src/main/java"
+    }
+  }
 }
 
 ['smokeTest', 'integrationTest', 'functionalTest'].each { configureSourceSet(it) }
@@ -81,8 +86,6 @@ openApiGenerate {
   outputDir = "$buildDir/generated/openapi".toString()
   apiPackage = "uk.gov.hmcts.opal.generated.".toString() + "http.api"
   modelPackage = "uk.gov.hmcts.opal.generated.".toString() + "model"
-  // Point to your customized mustache templates
-//  templateDir = "$rootDir/openapi/templates".toString()
   generateApiTests = false
   generateModelTests = false
   skipOperationExample = true
@@ -97,6 +100,7 @@ openApiGenerate {
           containerDefaultToNull              : "true",
           generatedConstructorWithRequiredArgs: "false",
           useBeanValidation                   : "true",
+          openApiNullable                     : "false"
   ]
 }
 tasks.withType(JavaCompile).configureEach {
