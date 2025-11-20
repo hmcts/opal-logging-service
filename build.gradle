@@ -263,7 +263,9 @@ flyway {
 wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
-
+checkstyle {
+  checkstyleMain.exclude '**uk/gov/hmcts/opal/generated/**'
+}
 tasks.register('runAllStyleChecks') {
   dependsOn 'checkstyleMain'
   dependsOn 'checkstyleTest'
