@@ -9,10 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.opal.logging.dto.IdentifierType;
-import uk.gov.hmcts.opal.logging.dto.ParticipantIdentifier;
-import uk.gov.hmcts.opal.logging.dto.PersonalDataProcessingCategory;
-import uk.gov.hmcts.opal.logging.dto.PersonalDataProcessingLogDetails;
+import uk.gov.hmcts.opal.generated.model.AddPDPLRequestPersonalDataProcessingLogging;
+import uk.gov.hmcts.opal.generated.model.AddPDPLRequestPersonalDataProcessingLogging.CategoryEnum;
+import uk.gov.hmcts.opal.generated.model.PDPLIdentifierPersonalDataProcessingLogging;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogEntity;
 import uk.gov.hmcts.opal.logging.persistence.repository.PdpoIdentifierRepository;
 import uk.gov.hmcts.opal.logging.persistence.repository.PdpoLogRepository;
@@ -35,7 +34,7 @@ class PersonalDataProcessingLogServiceIntegrationTest extends AbstractIntegratio
 
     @Test
     void reusesExistingBusinessIdentifierAcrossLogs() {
-        PersonalDataProcessingLogDetails request = baseRequest()
+        AddPDPLRequestPersonalDataProcessingLogging request = baseRequest()
             .businessIdentifier("SharingCo");
 
         service.recordLog(request);
@@ -48,10 +47,10 @@ class PersonalDataProcessingLogServiceIntegrationTest extends AbstractIntegratio
     @Test
     @Transactional
     void persistsDisclosureRecipientAndIndividuals() {
-        ParticipantIdentifier recipient = participant("recipient-42", "EXTERNAL_SERVICE");
+        PDPLIdentifierPersonalDataProcessingLogging recipient = participant("recipient-42", "EXTERNAL_SERVICE");
 
-        PersonalDataProcessingLogDetails request = baseRequest()
-            .category(PersonalDataProcessingCategory.DISCLOSURE_TRANSFERS)
+        AddPDPLRequestPersonalDataProcessingLogging request = baseRequest()
+            .category(CategoryEnum.DISCLOSURE)
             .recipient(recipient)
             .individuals(List.of(
                 participant("person-1", "DEFENDANT"),
@@ -65,19 +64,19 @@ class PersonalDataProcessingLogServiceIntegrationTest extends AbstractIntegratio
         assertThat(fromDb.getIndividuals()).hasSize(2);
     }
 
-    private PersonalDataProcessingLogDetails baseRequest() {
-        return new PersonalDataProcessingLogDetails()
+    private AddPDPLRequestPersonalDataProcessingLogging baseRequest() {
+        return new AddPDPLRequestPersonalDataProcessingLogging()
             .createdBy(participant("requestor-1", "OPAL_USER_ID"))
             .businessIdentifier("SharingCo")
             .createdAt(OffsetDateTime.parse("2025-11-15T12:45:00Z"))
             .ipAddress("192.168.1.10")
-            .category(PersonalDataProcessingCategory.COLLECTION)
+            .category(CategoryEnum.COLLECTION)
             .individuals(new ArrayList<>(List.of(participant("person-1", "DEFENDANT"))));
     }
 
-    private ParticipantIdentifier participant(String identifier, String type) {
-        return new ParticipantIdentifier()
-            .identifier(identifier)
-            .type(new IdentifierType().type(type));
+    private PDPLIdentifierPersonalDataProcessingLogging participant(String identifier, String type) {
+        return new PDPLIdentifierPersonalDataProcessingLogging()
+            .id(identifier)
+            .type(type);
     }
 }

@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.opal.logging.dto.ParticipantIdentifier;
-import uk.gov.hmcts.opal.logging.dto.PersonalDataProcessingLogDetails;
+import uk.gov.hmcts.opal.generated.model.AddPDPLRequestPersonalDataProcessingLogging;
+import uk.gov.hmcts.opal.generated.model.PDPLIdentifierPersonalDataProcessingLogging;
 import uk.gov.hmcts.opal.logging.domain.PdpoCategory;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoIdentifierEntity;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogEntity;
@@ -27,7 +27,7 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
     }
 
     @Override
-    public PdpoLogEntity recordLog(PersonalDataProcessingLogDetails details) {
+    public PdpoLogEntity recordLog(AddPDPLRequestPersonalDataProcessingLogging details) {
         String businessIdentifierValue = normalized(details.getBusinessIdentifier());
         PdpoIdentifierEntity identifier = identifierRepository.findByBusinessIdentifier(businessIdentifierValue)
             .orElseGet(() -> identifierRepository.save(
@@ -36,10 +36,10 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
                     .build()
             ));
 
-        PdpoCategory category = PdpoCategory.from(details.getCategory());
+        PdpoCategory category = PdpoCategory.fromRequestCategory(details.getCategory());
 
         PdpoLogEntity log = PdpoLogEntity.builder()
-            .createdByIdentifier(normalized(details.getCreatedBy().getIdentifier()))
+            .createdByIdentifier(normalized(details.getCreatedBy().getId()))
             .createdByIdentifierType(resolveType(details.getCreatedBy()))
             .createdAt(details.getCreatedAt())
             .ipAddress(normalized(details.getIpAddress()))
@@ -53,12 +53,12 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
         return logRepository.save(log);
     }
 
-    private void applyRecipient(PersonalDataProcessingLogDetails details,
+    private void applyRecipient(AddPDPLRequestPersonalDataProcessingLogging details,
                                 PdpoCategory category,
                                 PdpoLogEntity log) {
-        ParticipantIdentifier recipient = details.getRecipient();
+        PDPLIdentifierPersonalDataProcessingLogging recipient = details.getRecipient();
         if (category.requiresRecipient() && recipient != null) {
-            log.setRecipientIdentifier(normalized(recipient.getIdentifier()));
+            log.setRecipientIdentifier(normalized(recipient.getId()));
             log.setRecipientIdentifierType(resolveType(recipient));
         } else {
             log.setRecipientIdentifier(null);
@@ -66,7 +66,7 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
         }
     }
 
-    private void attachIndividuals(List<ParticipantIdentifier> participants, PdpoLogEntity log) {
+    private void attachIndividuals(List<PDPLIdentifierPersonalDataProcessingLogging> participants, PdpoLogEntity log) {
         if (participants == null) {
             return;
         }
@@ -74,15 +74,15 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
             .filter(Objects::nonNull)
             .forEach(participant -> {
                 PdpoLogIndividualEntity entity = PdpoLogIndividualEntity.builder()
-                    .individualIdentifier(normalized(participant.getIdentifier()))
+                    .individualIdentifier(normalized(participant.getId()))
                     .individualType(resolveType(participant))
                     .build();
                 log.addIndividual(entity);
             });
     }
 
-    private static String resolveType(ParticipantIdentifier identifier) {
-        return normalized(identifier.getType().getType());
+    private static String resolveType(PDPLIdentifierPersonalDataProcessingLogging identifier) {
+        return normalized(identifier.getType());
     }
 
     private static String normalized(String value) {
