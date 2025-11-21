@@ -265,6 +265,7 @@ wrapper {
 }
 checkstyle {
   checkstyleMain.exclude '**uk/gov/hmcts/opal/generated/**'
+  checkstyleMain.exclude '**/org/openapitools/**'
 }
 tasks.register('runAllStyleChecks') {
   dependsOn 'checkstyleMain'
