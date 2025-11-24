@@ -2,3 +2,20 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  secrets:
+    SERVICEBUS_SHARED_ACCESS_KEY:
+      secretRef: opal-sb-dev
+      key: primaryKey
+    SERVICEBUS_CONNECTION_STRING:
+      secretRef: opal-sb-dev
+      key: connectionString
+  environment:
+    SERVICEBUS_LOGGING_PDPL_QUEUE_NAME: "opal-logging-service-pr-${CHANGE_ID}-logging-pdpl"
+
+service-bus:
+  enabled: true
+  resourceGroup: "opal-aso-dev-rg"
+  sbNamespace: "opal"
+  setup:
+    queues:
+      - name: "opal-logging-service-pr-${CHANGE_ID}-logging-pdpl"
