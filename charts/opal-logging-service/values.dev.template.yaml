@@ -10,7 +10,7 @@ java:
       secretRef: opal-sb-dev
       key: connectionString
   environment:
-    SERVICEBUS_LOGGING_PDPL_QUEUE_NAME: "opal-logging-service-pr-${CHANGE_ID}-logging-pdpl"
+    SERVICEBUS_LOGGING_PDPL_QUEUE_NAME: "{{ .Release.Name}}-servicebus-yourQueue"
     APPLICATIONINSIGHTS_ROLE_NAME: "opal-logging-service-pr-${CHANGE_ID}"
 
 servicebus:
@@ -20,4 +20,4 @@ servicebus:
   sbNamespace: "opal-servicebus-dev"
   setup:
     queues:
-      - name: "opal-logging-service-pr-${CHANGE_ID}-logging-pdpl"
+      - name: "logging-pdpl"
