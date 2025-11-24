@@ -18,3 +18,11 @@ java:
           alias: OPAL_LOGGING_DB_USERNAME
         - name: logging-service-POSTGRES-DATABASE
           alias: OPAL_LOGGING_DB_NAME
+        - name: servicebus-connection-string
+          alias: SERVICEBUS_CONNECTION_STRING
+        - name: servicebus-shared-access-key
+          alias: SERVICEBUS_SHARED_ACCESS_KEY
+        - name: servicebus-logging-pdpl-queue-name
+          alias: SERVICEBUS_LOGGING_PDPL_QUEUE_NAME
+servicebus:
+  enabled: false
