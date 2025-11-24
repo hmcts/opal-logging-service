@@ -13,4 +13,4 @@ dependencies:
   - name: service-bus
     version: 1.2.1
     repository: 'oci://hmctspublic.azurecr.io/helm'
-    condition: servicebus.enabled
+    condition: service-bus.enabled
