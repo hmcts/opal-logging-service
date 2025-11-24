@@ -10,7 +10,7 @@ dependencies:
   - name: java
     version: 5.3.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
-  - name: service-bus
+  - name: servicebus
     version: 1.2.1
     repository: 'oci://hmctspublic.azurecr.io/helm'
-    condition: service-bus.enabled
+    condition: servicebus.enabled
