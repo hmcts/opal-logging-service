@@ -3,7 +3,10 @@ package uk.gov.hmcts.opal.logging.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.opal.generated.model.PersonalDataProcessingLogPersonalDataProcessingLogging;
 import uk.gov.hmcts.opal.logging.domain.PdpoCategory;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoIdentifierEntity;
@@ -70,5 +73,38 @@ class PersonalDataProcessingLogMapperTest {
         PersonalDataProcessingLogPersonalDataProcessingLogging dto = mapper.toDto(entity);
 
         assertThat(dto.getRecipient()).isNull();
+    }
+
+    @Test
+    void mapCategoryReturnsNullWhenCategoryNull() {
+        assertThat(mapper.mapCategory(null)).isNull();
+    }
+
+    @Test
+    void mapIndividualsReturnsEmptyListWhenNull() {
+        assertThat(mapper.mapIndividuals(null)).isEqualTo(List.of());
+    }
+
+    @ParameterizedTest
+    @EnumSource(PdpoCategory.class)
+    void toDtoMapsEveryCategory(PdpoCategory category) {
+        PdpoLogEntity entity = PdpoLogEntity.builder()
+            .id(10L)
+            .createdByIdentifier("requestor-1")
+            .createdByIdentifierType("OPAL_USER_ID")
+            .createdAt(OffsetDateTime.parse("2025-11-15T12:45:00Z"))
+            .ipAddress("192.168.1.10")
+            .category(category)
+            .businessIdentifier(PdpoIdentifierEntity.builder()
+                                    .id(20L)
+                                    .businessIdentifier("ACME")
+                                    .build())
+            .build();
+
+        PersonalDataProcessingLogPersonalDataProcessingLogging dto = mapper.toDto(entity);
+
+        assertThat(dto.getCategory()).isEqualTo(
+            PersonalDataProcessingLogPersonalDataProcessingLogging.CategoryEnum.valueOf(category.name())
+        );
     }
 }
