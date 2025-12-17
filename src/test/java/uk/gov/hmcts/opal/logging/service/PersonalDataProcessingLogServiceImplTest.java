@@ -17,9 +17,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.opal.generated.model.AddPDPLRequestPersonalDataProcessingLogging;
-import uk.gov.hmcts.opal.generated.model.AddPDPLRequestPersonalDataProcessingLogging.CategoryEnum;
-import uk.gov.hmcts.opal.generated.model.PDPLIdentifierPersonalDataProcessingLogging;
+import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
+import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest.CategoryEnum;
+import uk.gov.hmcts.opal.logging.generated.dto.ParticipantIdentifier;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoIdentifierEntity;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogEntity;
 import uk.gov.hmcts.opal.logging.persistence.repository.PdpoIdentifierRepository;
@@ -80,8 +80,8 @@ class PersonalDataProcessingLogServiceImplTest {
             PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()
         ));
 
-        PDPLIdentifierPersonalDataProcessingLogging first = identifier("ind-1", "DEFENDANT");
-        PDPLIdentifierPersonalDataProcessingLogging second = identifier("ind-2", "MINOR_CREDITOR");
+        ParticipantIdentifier first = identifier("ind-1", "DEFENDANT");
+        ParticipantIdentifier second = identifier("ind-2", "MINOR_CREDITOR");
 
         service.recordLog(minimalDetails()
             .businessIdentifier("ACME")
@@ -91,8 +91,8 @@ class PersonalDataProcessingLogServiceImplTest {
         assertThat(logCaptor.getValue().getIndividuals()).hasSize(2);
     }
 
-    private AddPDPLRequestPersonalDataProcessingLogging minimalDetails() {
-        return new AddPDPLRequestPersonalDataProcessingLogging()
+    private AddPdpoLogRequest minimalDetails() {
+        return new AddPdpoLogRequest()
             .createdBy(identifier("user-1", "OPAL_USER_ID"))
             .businessIdentifier("ACME")
             .createdAt(OffsetDateTime.parse("2025-11-09T10:15:30Z"))
@@ -101,8 +101,8 @@ class PersonalDataProcessingLogServiceImplTest {
             .individuals(new ArrayList<>());
     }
 
-    private PDPLIdentifierPersonalDataProcessingLogging identifier(String id, String type) {
-        return new PDPLIdentifierPersonalDataProcessingLogging()
+    private ParticipantIdentifier identifier(String id, String type) {
+        return new ParticipantIdentifier()
             .id(id)
             .type(type);
     }

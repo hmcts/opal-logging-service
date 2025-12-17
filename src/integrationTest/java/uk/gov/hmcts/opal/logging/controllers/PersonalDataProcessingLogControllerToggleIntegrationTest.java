@@ -10,9 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.opal.generated.model.AddPDPLRequestPersonalDataProcessingLogging;
-import uk.gov.hmcts.opal.generated.model.AddPDPLRequestPersonalDataProcessingLogging.CategoryEnum;
-import uk.gov.hmcts.opal.generated.model.PDPLIdentifierPersonalDataProcessingLogging;
+import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
+import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest.CategoryEnum;
+import uk.gov.hmcts.opal.logging.generated.dto.ParticipantIdentifier;
 import uk.gov.hmcts.opal.logging.persistence.repository.PdpoIdentifierRepository;
 import uk.gov.hmcts.opal.logging.persistence.repository.PdpoLogRepository;
 import uk.gov.hmcts.opal.logging.testsupport.AbstractIntegrationTest;
@@ -42,13 +42,13 @@ class PersonalDataProcessingLogControllerToggleIntegrationTest extends AbstractI
         assertThat(logRepository.count()).isZero();
     }
 
-    private AddPDPLRequestPersonalDataProcessingLogging baseRequest() {
-        return new AddPDPLRequestPersonalDataProcessingLogging()
-            .createdBy(new PDPLIdentifierPersonalDataProcessingLogging().id("requestor-1").type("OPAL_USER_ID"))
+    private AddPdpoLogRequest baseRequest() {
+        return new AddPdpoLogRequest()
+            .createdBy(new ParticipantIdentifier().id("requestor-1").type("OPAL_USER_ID"))
             .businessIdentifier("SharingCo")
             .createdAt(OffsetDateTime.parse("2025-11-15T12:45:00Z"))
             .ipAddress("192.168.1.10")
             .category(CategoryEnum.COLLECTION)
-            .addIndividualsItem(new PDPLIdentifierPersonalDataProcessingLogging().id("person-1").type("DEFENDANT"));
+            .addIndividualsItem(new ParticipantIdentifier().id("person-1").type("DEFENDANT"));
     }
 }

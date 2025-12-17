@@ -7,7 +7,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import uk.gov.hmcts.opal.generated.model.PersonalDataProcessingLogPersonalDataProcessingLogging;
+import org.mapstruct.factory.Mappers;
+import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogResponse;
 import uk.gov.hmcts.opal.logging.domain.PdpoCategory;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoIdentifierEntity;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogEntity;
@@ -15,7 +16,7 @@ import uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogIndividualEntity;
 
 class PersonalDataProcessingLogMapperTest {
 
-    private final PersonalDataProcessingLogMapper mapper = new PersonalDataProcessingLogMapperImpl();
+    private final PersonalDataProcessingLogMapper mapper = Mappers.getMapper(PersonalDataProcessingLogMapper.class);
 
     @Test
     void toDtoMapsAllFields() {
@@ -40,7 +41,7 @@ class PersonalDataProcessingLogMapperTest {
                                  .individualType("DEFENDANT")
                                  .build());
 
-        PersonalDataProcessingLogPersonalDataProcessingLogging dto = mapper.toDto(entity);
+        AddPdpoLogResponse dto = mapper.toDto(entity);
 
         assertThat(dto.getPdpoLogId()).isEqualTo(123L);
         assertThat(dto.getBusinessIdentifierId()).isEqualTo(98L);
@@ -49,9 +50,7 @@ class PersonalDataProcessingLogMapperTest {
         assertThat(dto.getCreatedBy().getType()).isEqualTo("OPAL_USER_ID");
         assertThat(dto.getRecipient().getId()).isEqualTo("recipient-42");
         assertThat(dto.getRecipient().getType()).isEqualTo("EXTERNAL_SERVICE");
-        assertThat(dto.getCategory()).isEqualTo(
-            PersonalDataProcessingLogPersonalDataProcessingLogging.CategoryEnum.DISCLOSURE
-        );
+        assertThat(dto.getCategory()).isEqualTo(AddPdpoLogResponse.CategoryEnum.DISCLOSURE);
         assertThat(dto.getIndividuals()).hasSize(1);
         assertThat(dto.getIndividuals().get(0).getId()).isEqualTo("person-1");
     }
@@ -70,7 +69,7 @@ class PersonalDataProcessingLogMapperTest {
                                     .build())
             .build();
 
-        PersonalDataProcessingLogPersonalDataProcessingLogging dto = mapper.toDto(entity);
+        AddPdpoLogResponse dto = mapper.toDto(entity);
 
         assertThat(dto.getRecipient()).isNull();
     }
@@ -101,10 +100,8 @@ class PersonalDataProcessingLogMapperTest {
                                     .build())
             .build();
 
-        PersonalDataProcessingLogPersonalDataProcessingLogging dto = mapper.toDto(entity);
+        AddPdpoLogResponse dto = mapper.toDto(entity);
 
-        assertThat(dto.getCategory()).isEqualTo(
-            PersonalDataProcessingLogPersonalDataProcessingLogging.CategoryEnum.valueOf(category.name())
-        );
+        assertThat(dto.getCategory()).isEqualTo(AddPdpoLogResponse.CategoryEnum.valueOf(category.name()));
     }
 }
