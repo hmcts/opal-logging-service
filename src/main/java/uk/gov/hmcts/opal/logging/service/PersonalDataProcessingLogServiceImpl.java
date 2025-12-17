@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.opal.generated.model.AddPDPLRequestPersonalDataProcessingLogging;
-import uk.gov.hmcts.opal.generated.model.PDPLIdentifierPersonalDataProcessingLogging;
+import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
+import uk.gov.hmcts.opal.logging.generated.dto.ParticipantIdentifier;
 import uk.gov.hmcts.opal.logging.domain.PdpoCategory;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoIdentifierEntity;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogEntity;
@@ -27,7 +27,7 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
     }
 
     @Override
-    public PdpoLogEntity recordLog(AddPDPLRequestPersonalDataProcessingLogging details) {
+    public PdpoLogEntity recordLog(AddPdpoLogRequest details) {
         String businessIdentifierValue = normalized(details.getBusinessIdentifier());
         PdpoIdentifierEntity identifier = identifierRepository.findByBusinessIdentifier(businessIdentifierValue)
             .orElseGet(() -> identifierRepository.save(
@@ -53,10 +53,10 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
         return logRepository.save(log);
     }
 
-    private void applyRecipient(AddPDPLRequestPersonalDataProcessingLogging details,
+    private void applyRecipient(AddPdpoLogRequest details,
                                 PdpoCategory category,
                                 PdpoLogEntity log) {
-        PDPLIdentifierPersonalDataProcessingLogging recipient = details.getRecipient();
+        ParticipantIdentifier recipient = details.getRecipient();
         if (category.requiresRecipient() && recipient != null) {
             log.setRecipientIdentifier(normalized(recipient.getId()));
             log.setRecipientIdentifierType(resolveType(recipient));
@@ -66,7 +66,7 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
         }
     }
 
-    private void attachIndividuals(List<PDPLIdentifierPersonalDataProcessingLogging> participants, PdpoLogEntity log) {
+    private void attachIndividuals(List<ParticipantIdentifier> participants, PdpoLogEntity log) {
         if (participants == null) {
             return;
         }
@@ -81,7 +81,7 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
             });
     }
 
-    private static String resolveType(PDPLIdentifierPersonalDataProcessingLogging identifier) {
+    private static String resolveType(ParticipantIdentifier identifier) {
         return normalized(identifier.getType());
     }
 

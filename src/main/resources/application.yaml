@@ -18,6 +18,11 @@ management:
       exposure:
         include: health, info, prometheus
 
+opal:
+  logging:
+    test-support:
+      enabled: ${OPAL_LOGGING_TEST_SUPPORT_ENABLED:false}
+
 springdoc:
   packagesToScan: uk.gov.hmcts.opal.logging.controllers
   writer-with-order-by-keys: true

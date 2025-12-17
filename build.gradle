@@ -1,3 +1,5 @@
+import org.gradle.api.plugins.quality.Checkstyle
+
 buildscript {
   dependencies {
     classpath("org.flywaydb:flyway-database-postgresql:11.19.0")
@@ -84,8 +86,8 @@ openApiGenerate {
   generatorName = "spring"
   inputSpec = layout.buildDirectory.file("openapi-bundled.yaml").get().asFile.absolutePath
   outputDir = layout.buildDirectory.dir("generated/openapi").get().asFile.absolutePath
-  apiPackage = "uk.gov.hmcts.opal.generated.".toString() + "http.api"
-  modelPackage = "uk.gov.hmcts.opal.generated.".toString() + "model"
+  apiPackage = "uk.gov.hmcts.opal.logging.generated.http.api"
+  modelPackage = "uk.gov.hmcts.opal.logging.generated.dto"
   generateApiTests = false
   generateModelTests = false
   skipOperationExample = true
@@ -95,7 +97,7 @@ openApiGenerate {
   configOptions = [
           dateLibrary                         : "java8",
           interfaceOnly                       : "true",
-          useTags                             : "true",
+          useTags                             : "false",
           useSpringBoot3                      : "true",
           containerDefaultToNull              : "true",
           generatedConstructorWithRequiredArgs: "false",
@@ -221,6 +223,8 @@ dependencies {
   implementation 'org.postgresql:postgresql'
   compileOnly 'org.projectlombok:lombok:1.18.42'
   annotationProcessor 'org.projectlombok:lombok:1.18.42'
+  implementation 'org.mapstruct:mapstruct:1.6.3'
+  annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
   testImplementation 'org.springframework.boot:spring-boot-devtools'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
@@ -264,8 +268,25 @@ wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
 checkstyle {
-  checkstyleMain.exclude '**uk/gov/hmcts/opal/generated/**'
-  checkstyleMain.exclude '**/org/openapitools/**'
+  // keep generated sources out of Checkstyle so only handwritten code is verified
+  def generatedPatterns = [
+    '**/build/generated/**',
+    '**/uk/gov/hmcts/opal/generated/**',
+    '**/uk/gov/hmcts/opal/logging/generated/**',
+    '**/org/openapitools/**'
+  ]
+  checkstyleMain.exclude generatedPatterns
+  checkstyleTest.exclude generatedPatterns
+  checkstyleIntegrationTest.exclude generatedPatterns
+  checkstyleFunctionalTest.exclude generatedPatterns
+  checkstyleSmokeTest?.exclude generatedPatterns
+}
+tasks.withType(Checkstyle).configureEach {
+  exclude '**/build/generated/**'
+}
+tasks.named("checkstyleMain").configure {
+  def manualMainDirs = sourceSets.main.java.srcDirs.findAll { !it.toPath().startsWith(buildDir.toPath()) }
+  setSource(files(manualMainDirs))
 }
 tasks.register('runAllStyleChecks') {
   dependsOn 'checkstyleMain'

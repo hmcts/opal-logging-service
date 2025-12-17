@@ -1,6 +1,6 @@
 package uk.gov.hmcts.opal.logging.domain;
 
-import uk.gov.hmcts.opal.generated.model.AddPDPLRequestPersonalDataProcessingLogging;
+import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
 
 /**
  * Internal representation of the PDPO categories persisted in the database.
@@ -13,7 +13,7 @@ public enum PdpoCategory {
     COMBINATION,
     ERASURE;
 
-    public static PdpoCategory fromRequestCategory(AddPDPLRequestPersonalDataProcessingLogging.CategoryEnum category) {
+    public static PdpoCategory fromRequestCategory(AddPdpoLogRequest.CategoryEnum category) {
         if (category == null) {
             throw new IllegalArgumentException("category must be provided");
         }
