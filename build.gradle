@@ -226,7 +226,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
   testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-  testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
+  testImplementation 'org.testcontainers:junit-jupiter:1.21.4'
   testImplementation 'org.testcontainers:postgresql'
 
   //Added to override dependency version to resolve vulnerability
