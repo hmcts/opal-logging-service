@@ -84,8 +84,8 @@ tasks.register("bundleOpenApi", JavaExec) {
 
 openApiGenerate {
   generatorName = "spring"
-  inputSpec = "$buildDir/openapi-bundled.yaml".toString()
-  outputDir = "$buildDir/generated/openapi".toString()
+  inputSpec = layout.buildDirectory.file("openapi-bundled.yaml").get().asFile.absolutePath
+  outputDir = layout.buildDirectory.dir("generated/openapi").get().asFile.absolutePath
   apiPackage = "uk.gov.hmcts.opal.logging.generated.http.api"
   modelPackage = "uk.gov.hmcts.opal.logging.generated.dto"
   generateApiTests = false
