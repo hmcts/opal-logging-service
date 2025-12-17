@@ -79,7 +79,7 @@ tasks.register("bundleOpenApi", JavaExec) {
   group = "openapi"
   description = "Bundle multiple OpenAPI YAML files into one"
   mainClass = 'uk.gov.hmcts.opal.openapi.OpenApiBundler'
-  args = ["$rootDir/src/main/resources/openapi", "$buildDir/openapi-bundled.yaml"]
+  args = ["$rootDir/src/main/resources/openapi", layout.buildDirectory.file("openapi-bundled.yaml").get().asFile.absolutePath]
 }
 
 openApiGenerate {
@@ -190,7 +190,7 @@ repositories {
 }
 
 ext {
-  log4JVersion = "2.25.2"
+  log4JVersion = "2.25.3"
   logbackVersion = "1.5.21"
 }
 
@@ -201,7 +201,7 @@ dependencies {
   openapiImplementation "io.swagger.core.v3:swagger-models:2.2.41"
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.41"
   openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1"
-  
+
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -230,7 +230,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
   testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-  testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
+  testImplementation 'org.testcontainers:junit-jupiter:1.21.4'
   testImplementation 'org.testcontainers:postgresql'
 
   //Added to override dependency version to resolve vulnerability
