@@ -2,6 +2,7 @@ package uk.gov.hmcts.opal.logging.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -115,10 +116,9 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
     }
 
     private PdpoCategory resolveCategory(AddPdpoLogRequest details) {
-        if (details.getCategory() == null) {
-            throw badRequest("category must be provided");
-        }
-        return PdpoCategory.fromRequestCategory(details.getCategory());
+        return Optional.ofNullable(details.getCategory())
+            .map(PdpoCategory::fromRequestCategory)
+            .orElseThrow(() -> badRequest("category must be provided"));
     }
 
     private PdpoLogSearchCriteria validateAndNormalise(SearchPdpoLogRequest request) {
