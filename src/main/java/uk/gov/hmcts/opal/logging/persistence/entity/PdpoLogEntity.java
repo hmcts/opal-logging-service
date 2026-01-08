@@ -23,9 +23,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-import org.hibernate.dialect.PostgreSQLInetJdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import uk.gov.hmcts.opal.logging.domain.PdpoCategory;
 
 @Entity
@@ -54,12 +53,12 @@ public class PdpoLogEntity {
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
-    @JdbcType(PostgreSQLInetJdbcType.class)
+    @JdbcTypeCode(SqlTypes.INET)
     @Column(name = "ip_address", nullable = false, columnDefinition = "INET")
     private String ipAddress;
 
     @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "category", nullable = false, columnDefinition = "pl_category_enum")
     private PdpoCategory category;
 
