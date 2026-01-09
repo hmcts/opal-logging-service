@@ -9,7 +9,7 @@ plugins {
   id 'application'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '3.5.8'
+  id 'org.springframework.boot' version '4.0.1'
   id 'com.github.ben-manes.versions' version '0.53.0'
   id 'org.sonarqube' version '7.2.2.6593'
   id 'org.flywaydb.flyway' version '11.20.0'
@@ -202,12 +202,15 @@ dependencies {
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.41"
   openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1"
 
-  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+  implementation 'org.springframework.boot:spring-boot-starter-restclient'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
-  implementation 'org.springframework.boot:spring-boot-starter-aop'
+  implementation 'org.springframework.boot:spring-boot-starter-aspectj'
   implementation 'org.springframework.boot:spring-boot-starter-json'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.15'
+  implementation("org.springframework.boot:spring-boot-starter-jackson")
+  implementation("org.springframework.boot:spring-boot-jackson2")
+  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1'
 
   implementation 'com.github.hmcts.java-logging:logging:7.0.0'
 
@@ -215,7 +218,7 @@ dependencies {
   implementation "org.apache.logging.log4j:log4j-to-slf4j:${log4JVersion}"
   implementation "ch.qos.logback:logback-classic:${logbackVersion}"
   implementation "ch.qos.logback:logback-core:${logbackVersion}"
-  implementation 'uk.gov.hmcts:spring-exception-handler:0.0.3'
+  implementation 'uk.gov.hmcts:spring-exception-handler:1.0.0'
   implementation 'org.flywaydb:flyway-core:11.20.0'
   runtimeOnly 'org.flywaydb:flyway-database-postgresql:11.20.0', {
     exclude group: 'org.flywaydb', module: 'flyway-core'
@@ -228,9 +231,13 @@ dependencies {
 
   testImplementation 'org.springframework.boot:spring-boot-devtools'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
   testImplementation 'io.rest-assured:rest-assured:5.5.6'
+
+  testImplementation "org.springframework.boot:spring-boot-starter-data-jpa-test"
   testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-  testImplementation 'org.testcontainers:junit-jupiter:1.21.4'
+  testImplementation platform('org.testcontainers:testcontainers-bom:1.21.4')
+  testImplementation 'org.testcontainers:junit-jupiter'
   testImplementation 'org.testcontainers:postgresql'
 
   //Added to override dependency version to resolve vulnerability
