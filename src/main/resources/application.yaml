@@ -22,6 +22,11 @@ opal:
   logging:
     test-support:
       enabled: ${OPAL_LOGGING_TEST_SUPPORT_ENABLED:false}
+    pdpl:
+      consumer:
+        enabled: ${LOGGING_PDPL_CONSUMER_ENABLED:false}
+        connection-string: ${LOGGING_PDPL_CONNECTION_STRING:}
+        queue-name: ${LOGGING_PDPL_QUEUE:logging-pdpl}
 
 springdoc:
   packagesToScan: uk.gov.hmcts.opal.logging.controllers
