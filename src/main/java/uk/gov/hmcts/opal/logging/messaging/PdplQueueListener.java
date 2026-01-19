@@ -19,7 +19,7 @@ public class PdplQueueListener {
         containerFactory = "pdplListenerContainerFactory"
     )
     public void onMessage(String messagePayload) {
-        log.debug(":QUEUE:pdpl:received");
+        log.debug("PDPL queue message received payload={}", messagePayload);
         consumer.consume(messagePayload);
     }
 }

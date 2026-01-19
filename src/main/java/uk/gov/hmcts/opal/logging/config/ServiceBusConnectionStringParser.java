@@ -30,7 +30,12 @@ final class ServiceBusConnectionStringParser {
             throw new IllegalArgumentException("Connection string missing Endpoint segment");
         }
 
-        URI endpointUri = URI.create(endpoint);
+        URI endpointUri;
+        try {
+            endpointUri = URI.create(endpoint);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Endpoint segment missing host", ex);
+        }
         String host = endpointUri.getHost();
         if (host == null || host.isBlank()) {
             throw new IllegalArgumentException("Endpoint segment missing host");

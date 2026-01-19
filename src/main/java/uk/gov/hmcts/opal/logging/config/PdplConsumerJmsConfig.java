@@ -22,7 +22,8 @@ public class PdplConsumerJmsConfig {
         ServiceBusConnectionStringParser.ConnectionDetails details =
             ServiceBusConnectionStringParser.parse(properties.getConnectionString());
 
-        String remoteUri = "amqps://%s".formatted(details.fullyQualifiedNamespace());
+        String remoteUri = "%s://%s".formatted(properties.getEndpointScheme(),
+            details.fullyQualifiedNamespace());
 
         JmsConnectionFactory qpidFactory = new JmsConnectionFactory(remoteUri);
         qpidFactory.setUsername(details.sharedAccessKeyName());

@@ -100,6 +100,7 @@ Enable the Azure Service Bus consumer and provide the queue connection details:
 - `LOGGING_PDPL_CONSUMER_ENABLED=true`
 - `LOGGING_PDPL_CONNECTION_STRING=<Azure Service Bus connection string>`
 - `LOGGING_PDPL_QUEUE=logging-pdpl`
+- `LOGGING_PDPL_ENDPOINT_SCHEME=amqps` (optional; use `amqp` for emulator)
 
 ### PDPL queue processing notes
 The listener uses `Session.CLIENT_ACKNOWLEDGE`, so acknowledgements are only sent after the

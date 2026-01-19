@@ -27,6 +27,7 @@ opal:
         enabled: ${LOGGING_PDPL_CONSUMER_ENABLED:false}
         connection-string: ${LOGGING_PDPL_CONNECTION_STRING:}
         queue-name: ${LOGGING_PDPL_QUEUE:logging-pdpl}
+        endpoint-scheme: ${LOGGING_PDPL_ENDPOINT_SCHEME:amqps}
 
 springdoc:
   packagesToScan: uk.gov.hmcts.opal.logging.controllers

@@ -30,7 +30,7 @@ public class PdpoQueueConsumerImpl implements PdpoQueueConsumer {
             throw new IllegalArgumentException("PDPO message payload missing details");
         }
         logService.recordLog(details);
-        log.info(":QUEUE:pdpl:processed businessIdentifier={} category={}",
+        log.info("PDPL queue message processed businessIdentifier={} category={}",
             details.getBusinessIdentifier(),
             details.getCategory());
     }
@@ -42,7 +42,7 @@ public class PdpoQueueConsumerImpl implements PdpoQueueConsumer {
         try {
             return objectMapper.readValue(messagePayload, PdpoQueueMessage.class);
         } catch (IOException ex) {
-            log.warn(":QUEUE:pdpl:parse-failed", ex);
+            log.error("PDPL queue message parse failed", ex);
             throw new IllegalArgumentException("Unable to parse PDPO message payload", ex);
         }
     }

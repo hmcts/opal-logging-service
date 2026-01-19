@@ -67,4 +67,42 @@ class PdpoQueueConsumerImplTest {
 
         verify(logService, never()).recordLog(Mockito.any());
     }
+
+    @Test
+    void consumeRejectsBlankPayload() {
+        PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, logService);
+
+        assertThatThrownBy(() -> consumer.consume("   "))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("payload is blank");
+
+        verify(logService, never()).recordLog(Mockito.any());
+    }
+
+    @Test
+    void consumeRejectsInvalidJson() {
+        PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, logService);
+
+        assertThatThrownBy(() -> consumer.consume("{invalid"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Unable to parse");
+
+        verify(logService, never()).recordLog(Mockito.any());
+    }
+
+    @Test
+    void consumeRejectsMissingDetails() throws Exception {
+        PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, logService);
+
+        String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("PDPO", null));
+
+        assertThatThrownBy(() -> consumer.consume(payload))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("missing details");
+
+        verify(logService, never()).recordLog(Mockito.any());
+    }
 }

@@ -1,35 +1,15 @@
 package uk.gov.hmcts.opal.logging.config;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "opal.logging.pdpl.consumer")
+@Data
 public class PdplConsumerProperties {
 
     private boolean enabled;
     private String connectionString;
     private String queueName;
+    private String endpointScheme = "amqps";
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getConnectionString() {
-        return connectionString;
-    }
-
-    public void setConnectionString(String connectionString) {
-        this.connectionString = connectionString;
-    }
-
-    public String getQueueName() {
-        return queueName;
-    }
-
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
 }

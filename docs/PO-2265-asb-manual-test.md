@@ -14,6 +14,7 @@ Set these before starting `opal-logging-service` (no defaults are applied for th
 - `LOGGING_PDPL_CONSUMER_ENABLED=true`
 - `LOGGING_PDPL_CONNECTION_STRING=<Azure Service Bus connection string>`
 - `LOGGING_PDPL_QUEUE=<queue name>` (e.g. `logging-pdpl`)
+- `LOGGING_PDPL_ENDPOINT_SCHEME=amqps` (optional; use `amqp` for emulator)
 
 If your database settings are not already configured, set these as well:
 
