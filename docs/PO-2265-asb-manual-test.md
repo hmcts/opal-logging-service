@@ -9,12 +9,12 @@ Validate that a PDPO message published to Azure Service Bus is consumed by the l
 
 ## 2. Environment Variables
 ### Logging Service (consumer)
-Set these before starting `opal-logging-service` (no defaults are applied for the queue settings):
+Set these before starting `opal-logging-service` (defaults point at the local emulator; consumer is enabled by default):
 
-- `LOGGING_PDPL_CONSUMER_ENABLED=true`
-- `LOGGING_PDPL_CONNECTION_STRING=<Azure Service Bus connection string>`
-- `LOGGING_PDPL_QUEUE=<queue name>` (e.g. `logging-pdpl`)
-- `LOGGING_PDPL_ENDPOINT_SCHEME=amqps` (optional; use `amqp` for emulator)
+- `LOGGING_PDPL_CONSUMER_ENABLED=true` (optional; defaults to `true`)
+- `SERVICEBUS_CONNECTION_STRING=<Azure Service Bus connection string>`
+- `SERVICEBUS_LOGGING_PDPL_QUEUE_NAME=<queue name>` (e.g. `logging-pdpl`)
+- `SERVICEBUS_LOGGING_PDPL_PROTOCOL=amqps` (optional; defaults to emulator-friendly `amqp`)
 
 If your database settings are not already configured, set these as well:
 
@@ -28,8 +28,8 @@ If your database settings are not already configured, set these as well:
 Set these before running the manual test in this repository (reuse the same queue settings):
 
 - `LOGGING_PDPL_ASB_TEST_ENABLED=true`
-- `LOGGING_PDPL_CONNECTION_STRING=<Azure Service Bus connection string>`
-- `LOGGING_PDPL_QUEUE=<queue name>` (e.g. `logging-pdpl`)
+- `SERVICEBUS_CONNECTION_STRING=<Azure Service Bus connection string>`
+- `SERVICEBUS_LOGGING_PDPL_QUEUE_NAME=<queue name>` (e.g. `logging-pdpl`)
 
 ## 3. Enqueue a PDPO Message
 ### Run the connectivity test

@@ -24,10 +24,10 @@ opal:
       enabled: ${OPAL_LOGGING_TEST_SUPPORT_ENABLED:false}
     pdpl:
       consumer:
-        enabled: ${LOGGING_PDPL_CONSUMER_ENABLED:false}
-        connection-string: ${LOGGING_PDPL_CONNECTION_STRING:}
-        queue-name: ${LOGGING_PDPL_QUEUE:logging-pdpl}
-        endpoint-scheme: ${LOGGING_PDPL_ENDPOINT_SCHEME:amqps}
+        enabled: ${LOGGING_PDPL_CONSUMER_ENABLED:true}
+        connection-string: ${SERVICEBUS_CONNECTION_STRING:Endpoint=sb://localhost/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=local;UseDevelopmentEmulator=true}
+        queue-name: ${SERVICEBUS_LOGGING_PDPL_QUEUE_NAME:logging-pdpl}
+        protocol: ${SERVICEBUS_LOGGING_PDPL_PROTOCOL:amqp}
 
 springdoc:
   packagesToScan: uk.gov.hmcts.opal.logging.controllers

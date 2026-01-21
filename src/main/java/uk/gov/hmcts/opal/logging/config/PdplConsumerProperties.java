@@ -10,6 +10,6 @@ public class PdplConsumerProperties {
     private boolean enabled;
     private String connectionString;
     private String queueName;
-    private String endpointScheme = "amqps";
+    private String protocol = "amqps";
 
 }

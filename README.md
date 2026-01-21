@@ -95,24 +95,30 @@ When running the service locally (outside Docker), use the host-mapped database 
 - `OPAL_LOGGING_DB_PASSWORD=opal-logging`
 
 ### PDPL queue consumer
-Enable the Azure Service Bus consumer and provide the queue connection details:
+Enable the Azure Service Bus consumer and provide the queue connection details (enabled by default):
 
-- `LOGGING_PDPL_CONSUMER_ENABLED=true`
-- `LOGGING_PDPL_CONNECTION_STRING=<Azure Service Bus connection string>`
-- `LOGGING_PDPL_QUEUE=logging-pdpl`
-- `LOGGING_PDPL_ENDPOINT_SCHEME=amqps` (optional; use `amqp` for emulator)
+- `LOGGING_PDPL_CONSUMER_ENABLED=true` (optional; defaults to `true`)
+- `SERVICEBUS_CONNECTION_STRING=<Azure Service Bus connection string>`
+- `SERVICEBUS_LOGGING_PDPL_QUEUE_NAME=logging-pdpl`
+- `SERVICEBUS_LOGGING_PDPL_PROTOCOL=amqps` (optional; defaults to emulator-friendly `amqp`)
 
 ### PDPL queue processing notes
 The listener uses `Session.CLIENT_ACKNOWLEDGE`, so acknowledgements are only sent after the
 `@JmsListener` completes successfully. Let exceptions propagate (do not swallow them) so
 failed messages are redelivered.
 
+### Azure Service Bus emulator (local)
+`docker compose up` now includes the Service Bus emulator plus its SQL Server dependency.
+The emulator configuration lives in `ServiceBus_Emulator_config.json` and defines the
+`logging-pdpl` queue. Defaults in `application.yaml` point at the emulator, and the compose
+file overrides `SERVICEBUS_CONNECTION_STRING` to use the Docker network hostname.
+
 ### PDPL queue manual publisher (developer testing)
 Use the manual publisher to enqueue a PDPO message to any Azure Service Bus queue:
 
 - `LOGGING_PDPL_ASB_TEST_ENABLED=true`
-- `LOGGING_PDPL_CONNECTION_STRING=<Azure Service Bus connection string>`
-- `LOGGING_PDPL_QUEUE=<queue name>`
+- `SERVICEBUS_CONNECTION_STRING=<Azure Service Bus connection string>`
+- `SERVICEBUS_LOGGING_PDPL_QUEUE_NAME=<queue name>`
 
 Run it from the repo root:
 

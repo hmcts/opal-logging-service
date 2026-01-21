@@ -34,8 +34,8 @@ class PdplQueueConnectivityIntegrationTest {
 
     @Test
     void sendsPdpoMessageToQueue() throws Exception {
-        String connectionString = requireEnv("LOGGING_PDPL_CONNECTION_STRING");
-        String queueName = requireEnv("LOGGING_PDPL_QUEUE");
+        String connectionString = requireEnv("SERVICEBUS_CONNECTION_STRING");
+        String queueName = requireEnv("SERVICEBUS_LOGGING_PDPL_QUEUE_NAME");
 
         ServiceBusConnectionStringParser.ConnectionDetails details =
             ServiceBusConnectionStringParser.parse(connectionString);

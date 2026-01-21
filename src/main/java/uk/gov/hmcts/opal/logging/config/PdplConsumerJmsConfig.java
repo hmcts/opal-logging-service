@@ -22,7 +22,7 @@ public class PdplConsumerJmsConfig {
         ServiceBusConnectionStringParser.ConnectionDetails details =
             ServiceBusConnectionStringParser.parse(properties.getConnectionString());
 
-        String remoteUri = "%s://%s".formatted(properties.getEndpointScheme(),
+        String remoteUri = "%s://%s".formatted(properties.getProtocol(),
             details.fullyQualifiedNamespace());
 
         JmsConnectionFactory qpidFactory = new JmsConnectionFactory(remoteUri);
