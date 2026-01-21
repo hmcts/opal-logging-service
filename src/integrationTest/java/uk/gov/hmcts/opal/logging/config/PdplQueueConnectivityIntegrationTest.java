@@ -36,11 +36,12 @@ class PdplQueueConnectivityIntegrationTest {
     void sendsPdpoMessageToQueue() throws Exception {
         String connectionString = requireEnv("SERVICEBUS_CONNECTION_STRING");
         String queueName = requireEnv("SERVICEBUS_LOGGING_PDPL_QUEUE_NAME");
+        String protocol = optionalEnv("SERVICEBUS_LOGGING_PDPL_PROTOCOL", "amqps");
 
         ServiceBusConnectionStringParser.ConnectionDetails details =
             ServiceBusConnectionStringParser.parse(connectionString);
 
-        String remoteUri = "amqps://%s".formatted(details.fullyQualifiedNamespace());
+        String remoteUri = "%s://%s".formatted(protocol, details.fullyQualifiedNamespace());
         JmsConnectionFactory connectionFactory = new JmsConnectionFactory(remoteUri);
         connectionFactory.setUsername(details.sharedAccessKeyName());
         connectionFactory.setPassword(details.sharedAccessKey());
@@ -68,6 +69,14 @@ class PdplQueueConnectivityIntegrationTest {
         String value = System.getenv(name);
         if (value == null || value.isBlank()) {
             throw new IllegalStateException(name + " must be set when LOGGING_PDPL_ASB_TEST_ENABLED=true");
+        }
+        return value;
+    }
+
+    private static String optionalEnv(String name, String defaultValue) {
+        String value = System.getenv(name);
+        if (value == null || value.isBlank()) {
+            return defaultValue;
         }
         return value;
     }
