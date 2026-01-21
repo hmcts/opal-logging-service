@@ -200,7 +200,7 @@ dependencies {
   openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.37"
   openapiImplementation "io.swagger.core.v3:swagger-models:2.2.42"
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.42"
-  openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1"
+  openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.0"
 
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
