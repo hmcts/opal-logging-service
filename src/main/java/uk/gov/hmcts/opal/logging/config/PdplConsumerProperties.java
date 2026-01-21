@@ -11,5 +11,6 @@ public class PdplConsumerProperties {
     private String connectionString;
     private String queueName;
     private String protocol = "amqps";
+    private long idleTimeoutMs;
 
 }

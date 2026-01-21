@@ -28,6 +28,7 @@ opal:
         connection-string: ${SERVICEBUS_CONNECTION_STRING:Endpoint=sb://localhost/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=local;UseDevelopmentEmulator=true}
         queue-name: ${SERVICEBUS_LOGGING_PDPL_QUEUE_NAME:logging-pdpl}
         protocol: ${SERVICEBUS_LOGGING_PDPL_PROTOCOL:amqp}
+        idle-timeout-ms: ${SERVICEBUS_IDLE_TIMEOUT_MS:30000}
 
 springdoc:
   packagesToScan: uk.gov.hmcts.opal.logging.controllers

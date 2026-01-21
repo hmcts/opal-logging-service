@@ -26,5 +26,6 @@ java:
           alias: SERVICEBUS_LOGGING_PDPL_QUEUE_NAME
   environment:
     SERVICEBUS_LOGGING_PDPL_PROTOCOL: amqps
+    SERVICEBUS_IDLE_TIMEOUT_MS: 30000
 servicebus:
   enabled: false
