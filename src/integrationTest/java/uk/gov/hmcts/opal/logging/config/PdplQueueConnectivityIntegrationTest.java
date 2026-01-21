@@ -1,6 +1,7 @@
 package uk.gov.hmcts.opal.logging.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.jms.JMSContext;
@@ -29,6 +30,7 @@ class PdplQueueConnectivityIntegrationTest {
 
     private final ObjectMapper objectMapper = JsonMapper.builder()
         .findAndAddModules()
+        .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .build();
 

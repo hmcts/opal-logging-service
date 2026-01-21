@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -19,7 +20,10 @@ import uk.gov.hmcts.opal.logging.service.PersonalDataProcessingLogService;
 
 class PdpoQueueConsumerImplTest {
 
-    private final ObjectMapper objectMapper = JsonMapper.builder().findAndAddModules().build();
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+        .findAndAddModules()
+        .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+        .build();
 
     @Test
     void consumeParsesMessageAndPersistsLog() throws Exception {

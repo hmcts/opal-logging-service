@@ -38,6 +38,8 @@ spring:
     import: "optional:configtree:/mnt/secrets/opal/"
   application:
     name: Opal Logging Service
+  jackson:
+    property-naming-strategy: SNAKE_CASE
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${OPAL_LOGGING_DB_HOST:localhost}:${OPAL_LOGGING_DB_PORT:5432}/${OPAL_LOGGING_DB_NAME:opal-logging-db}${OPAL_LOGGING_DB_OPTIONS:}
