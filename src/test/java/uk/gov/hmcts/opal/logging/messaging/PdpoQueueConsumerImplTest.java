@@ -45,9 +45,7 @@ class PdpoQueueConsumerImplTest {
         ArgumentCaptor<AddPdpoLogRequest> captor = ArgumentCaptor.forClass(AddPdpoLogRequest.class);
         verify(logService).recordLog(captor.capture());
         AddPdpoLogRequest captured = captor.getValue();
-        assertThat(captured.getBusinessIdentifier()).isEqualTo("ACME");
-        assertThat(captured.getCreatedBy().getId()).isEqualTo("user-1");
-        assertThat(captured.getIndividuals()).hasSize(1);
+        assertThat(captured).isEqualTo(details);
     }
 
     @Test
