@@ -82,7 +82,58 @@ docker image rm <image-id>
 
 There is no need to remove postgres and java or similar core images.
 
+## Environment variables
+
+### Database (local run)
+When running the service locally (outside Docker), use the host-mapped database port from
+`docker-compose.yml`:
+
+- `OPAL_LOGGING_DB_HOST=localhost`
+- `OPAL_LOGGING_DB_PORT=5436`
+- `OPAL_LOGGING_DB_NAME=opal-logging-db`
+- `OPAL_LOGGING_DB_USERNAME=opal-logging`
+- `OPAL_LOGGING_DB_PASSWORD=opal-logging`
+
+### PDPL queue consumer
+Enable the Azure Service Bus consumer and provide the queue connection details (enabled by default):
+
+- `LOGGING_PDPL_CONSUMER_ENABLED=true` (optional; defaults to `true`)
+- `SERVICEBUS_CONNECTION_STRING=<Azure Service Bus connection string>`
+- `SERVICEBUS_LOGGING_PDPL_QUEUE_NAME=logging-pdpl`
+- `SERVICEBUS_LOGGING_PDPL_PROTOCOL=amqps` (optional; defaults to emulator-friendly `amqp`)
+
+### PDPL queue processing notes
+The listener uses `Session.CLIENT_ACKNOWLEDGE`, so acknowledgements are only sent after the
+`@JmsListener` completes successfully. Let exceptions propagate (do not swallow them) so
+failed messages are redelivered.
+
+### Azure Service Bus emulator (local)
+`docker compose up` now includes the Service Bus emulator plus its SQL Server dependency.
+The emulator configuration lives in `ServiceBus_Emulator_config.json` and defines the
+`logging-pdpl` queue. Defaults in `application.yaml` point at the emulator, and the compose
+file overrides `SERVICEBUS_CONNECTION_STRING` to use the Docker network hostname.
+
+### PDPL queue manual publisher (developer testing)
+Use the manual publisher to enqueue a PDPO message to any Azure Service Bus queue:
+
+- `LOGGING_PDPL_ASB_TEST_ENABLED=true`
+- `SERVICEBUS_CONNECTION_STRING=<Azure Service Bus connection string>`
+- `SERVICEBUS_LOGGING_PDPL_QUEUE_NAME=<queue name>`
+
+Run it from the repo root:
+
+```bash
+LOGGING_PDPL_ASB_TEST_ENABLED=true ./gradlew integration \
+  --tests uk.gov.hmcts.opal.logging.config.PdplQueueConnectivityIntegrationTest
+```
+
+For the full manual flow, see `docs/PO-2265-asb-manual-test.md`.
+
+### Test-support endpoints (optional)
+Enable the test-support REST endpoints (disabled by default):
+
+- `OPAL_LOGGING_TEST_SUPPORT_ENABLED=true`
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
