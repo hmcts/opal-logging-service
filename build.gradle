@@ -18,7 +18,7 @@ plugins {
     See https://github.com/hmcts/gradle-java-plugin
  */
   id 'uk.gov.hmcts.java' version '0.12.67'
-  id "org.openapi.generator" version "7.18.0"
+  id "org.openapi.generator" version "7.19.0"
 }
 
 application {
