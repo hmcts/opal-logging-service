@@ -1,0 +1,34 @@
+include:
+  - path: ../opal-shared-infrastructure/docker-compose.yml
+  - path: ../opal-shared-infrastructure/docker-compose-service-bus.yml
+
+services:
+  opal-logging-service:
+    environment:
+      # these environment variables are used by java-logging library
+      - ROOT_APPENDER
+      - JSON_CONSOLE_PRETTY_PRINT
+      - ROOT_LOGGING_LEVEL
+      - REFORM_SERVICE_TYPE
+      - REFORM_SERVICE_NAME
+      - REFORM_TEAM
+      - REFORM_ENVIRONMENT
+      - LOGBACK_DATE_FORMAT
+      - LOGBACK_REQUIRE_THREAD
+      - LOGBACK_REQUIRE_ALERT_LEVEL=false
+      - LOGBACK_REQUIRE_ERROR_CODE=false
+      - OPAL_LOGGING_DB_HOST=opal-db
+      - OPAL_LOGGING_DB_USERNAME=opal-db-user
+      - OPAL_LOGGING_DB_PASSWORD=opal-db-password
+      - LOGGING_PDPL_CONSUMER_ENABLED=true
+      - SERVICEBUS_CONNECTION_STRING=Endpoint=sb://sb-emulator/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=local;UseDevelopmentEmulator=true
+      - SERVICEBUS_LOGGING_PDPL_PROTOCOL=amqp
+      - SERVICEBUS_LOGGING_PDPL_QUEUE_NAME=logging-pdpl
+    ports:
+      - "${LOGGING_PORT:-4065}:4065"
+    networks:
+      - default
+      - sb-emulator
+    depends_on:
+      - opal-db
+      - redis
