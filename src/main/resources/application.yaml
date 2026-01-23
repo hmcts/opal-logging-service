@@ -63,9 +63,9 @@ spring:
             # silence the 'wall-of-text' - unnecessary exception throw about blob types
             non_contextual_creation: true
   flyway:
-    url: jdbc:postgresql://${OPAL_LOGGING_DB_HOST:localhost}:${OPAL_LOGGING_DB_PORT:5432}/${OPAL_LOGGING_DB_NAME:opal-logging-db}${OPAL_LOGGING_DB_OPTIONS:}
-    user: ${OPAL_LOGGING_DB_USERNAME:opal-logging}
-    password: ${OPAL_LOGGING_DB_PASSWORD:opal-logging}
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
     locations: ${FLYWAY_LOCATIONS:classpath:db/migration/allEnvs, classpath:db/migration/devOnly, classpath:db/migration/stgOnly}
     baseline-on-migrate: true
     ignoreMigrationPatterns: "*:missing"
