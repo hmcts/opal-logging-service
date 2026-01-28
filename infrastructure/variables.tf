@@ -22,7 +22,7 @@ variable "jenkins_AAD_objectId" {
 
 variable "pgsql_databases" {
   description = "List of PostgreSQL databases to create"
-  type        = list(object({
+  type = list(object({
     name = string
   }))
   default = [
@@ -35,7 +35,7 @@ variable "pgsql_databases" {
 
 variable "db_name" {
   description = "Name of the app database"
-  default = "opal-logging-db"
+  default     = "opal-logging-db"
 }
 
 variable "pgsql_server_configuration" {
