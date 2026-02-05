@@ -2,7 +2,7 @@ services:
   opal-logging-service:
     image: opal-logging-service:local
     build:
-      context: .
+      context: ../opal-logging-service
       args:
         - http_proxy
         - https_proxy
