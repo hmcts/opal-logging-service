@@ -219,7 +219,7 @@ dependencies {
   implementation "org.apache.logging.log4j:log4j-to-slf4j:${log4JVersion}"
   implementation "ch.qos.logback:logback-classic:${logbackVersion}"
   implementation "ch.qos.logback:logback-core:${logbackVersion}"
-  implementation 'uk.gov.hmcts:spring-exception-handler:0.0.3'
+  implementation 'uk.gov.hmcts:spring-exception-handler:1.0.0'
   implementation 'org.flywaydb:flyway-core:12.0.2'
   runtimeOnly 'org.flywaydb:flyway-database-postgresql:12.0.2', {
     exclude group: 'org.flywaydb', module: 'flyway-core'
