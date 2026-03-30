@@ -161,9 +161,7 @@ components:
           description: Human-readable business identifier/description. Reuse existing description id if present; otherwise create new one.
         ip_address:
           type: string
-          oneOf:
-            - format: ipv4
-            - format: ipv6
+          x-maintainer-note: Use plain string for openapi-generator compatibility; oneOf(format ipv4, format ipv6) breaks with generator 7.21.0.
           description: Requester's IP address (IPv4 or IPv6).
         category:
           type: string
@@ -216,9 +214,7 @@ components:
           description: Business identifier text.
         ip_address:
           type: string
-          oneOf:
-            - format: ipv4
-            - format: ipv6
+          x-maintainer-note: Use plain string for openapi-generator compatibility; oneOf(format ipv4, format ipv6) breaks with generator 7.21.0.
           description: Requester's IP address (ipv4 or ipv6).
         category:
           type: string
