@@ -1,14 +1,14 @@
 package uk.gov.hmcts.opal.logging.testsupport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import static uk.gov.hmcts.opal.logging.testsupport.TestContainerConfig.POSTGRES_CONTAINER;
 
@@ -30,5 +30,8 @@ public class AbstractIntegrationTest {
         registry.add("spring.datasource.url", POSTGRES_CONTAINER::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES_CONTAINER::getUsername);
         registry.add("spring.datasource.password", POSTGRES_CONTAINER::getPassword);
+        registry.add("spring.flyway.url", POSTGRES_CONTAINER::getJdbcUrl);
+        registry.add("spring.flyway.user", POSTGRES_CONTAINER::getUsername);
+        registry.add("spring.flyway.password", POSTGRES_CONTAINER::getPassword);
     }
 }
