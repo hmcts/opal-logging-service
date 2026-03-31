@@ -1,10 +1,10 @@
 package uk.gov.hmcts.opal.logging.messaging;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.service.PersonalDataProcessingLogService;
 
@@ -41,7 +41,7 @@ public class PdpoQueueConsumerImpl implements PdpoQueueConsumer {
         }
         try {
             return objectMapper.readValue(messagePayload, PdpoQueueMessage.class);
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             log.error("PDPL queue message parse failed", ex);
             throw new IllegalArgumentException("Unable to parse PDPO message payload", ex);
         }

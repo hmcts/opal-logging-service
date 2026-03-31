@@ -1,38 +1,23 @@
 package uk.gov.hmcts.opal.logging.controllers;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.opal.logging.testsupport.AbstractFunctionalTest;
+import uk.gov.hmcts.opal.logging.testsupport.TestHttpClient;
 
-import static io.restassured.RestAssured.given;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 class SampleFunctionalTest extends AbstractFunctionalTest {
-    protected static final String CONTENT_TYPE_VALUE = "application/json";
-
-    @Value("${TEST_URL:http://localhost:8080}")
+    @Value("${TEST_URL:http://localhost:4065}")
     private String testUrl;
 
-    @BeforeEach
-    public void setUp() {
-        RestAssured.baseURI = testUrl;
-        RestAssured.useRelaxedHTTPSValidation();
-    }
-
     @Test
-    void functionalTest() {
-        Response response = given()
-            .contentType(ContentType.JSON)
-            .when()
-            .get()
-            .then()
-            .extract().response();
+    void functionalTest() throws IOException, GeneralSecurityException {
+        TestHttpClient.Response response = TestHttpClient.get(testUrl + "/");
 
         Assertions.assertEquals(200, response.statusCode());
-        Assertions.assertTrue(response.asString().startsWith("Welcome"));
+        Assertions.assertTrue(response.body().startsWith("Welcome"));
     }
 }

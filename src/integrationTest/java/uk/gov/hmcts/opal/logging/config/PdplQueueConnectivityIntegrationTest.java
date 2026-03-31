@@ -1,9 +1,5 @@
 package uk.gov.hmcts.opal.logging.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.jms.JMSContext;
 import jakarta.jms.Queue;
 import java.time.OffsetDateTime;
@@ -15,6 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest.CategoryEnum;
 import uk.gov.hmcts.opal.logging.generated.dto.ParticipantIdentifier;
@@ -31,7 +31,7 @@ class PdplQueueConnectivityIntegrationTest {
     private final ObjectMapper objectMapper = JsonMapper.builder()
         .findAndAddModules()
         .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
         .build();
 
     @Test

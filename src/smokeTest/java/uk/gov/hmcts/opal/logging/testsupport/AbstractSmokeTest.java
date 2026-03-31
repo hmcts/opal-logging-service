@@ -1,7 +1,7 @@
 package uk.gov.hmcts.opal.logging.testsupport;
 
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -22,5 +22,8 @@ public class AbstractSmokeTest {
         registry.add("spring.datasource.url", POSTGRES_CONTAINER::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES_CONTAINER::getUsername);
         registry.add("spring.datasource.password", POSTGRES_CONTAINER::getPassword);
+        registry.add("spring.flyway.url", POSTGRES_CONTAINER::getJdbcUrl);
+        registry.add("spring.flyway.user", POSTGRES_CONTAINER::getUsername);
+        registry.add("spring.flyway.password", POSTGRES_CONTAINER::getPassword);
     }
 }
