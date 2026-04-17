@@ -61,7 +61,13 @@ class PdpoLogSpecificationsTest {
         persistLog("user-1", "OPAL_USER_ID", "ACC-1", PdpoCategory.DISCLOSURE);
         persistLog("user-2", "EXTERNAL_SERVICE", "ACC-1", PdpoCategory.DISCLOSURE);
 
-        PdpoLogSearchCriteria criteria = new PdpoLogSearchCriteria("user-1", "OPAL_USER_ID", null, null);
+        PdpoLogSearchCriteria criteria = new PdpoLogSearchCriteria(
+            "user-1",
+            "OPAL_USER_ID",
+            null,
+            null,
+            null
+        );
 
         List<PdpoLogEntity> results = logRepository.findAll(
             specifications.findBySearchCriteria(criteria),
@@ -82,6 +88,7 @@ class PdpoLogSpecificationsTest {
             null,
             null,
             "ACC-1",
+            null,
             PdpoCategory.DISCLOSURE
         );
 
