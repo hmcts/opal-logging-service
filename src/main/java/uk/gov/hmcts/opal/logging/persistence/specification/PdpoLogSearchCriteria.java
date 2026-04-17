@@ -8,5 +8,6 @@ import uk.gov.hmcts.opal.logging.domain.PdpoCategory;
 public record PdpoLogSearchCriteria(String createdByIdentifier,
                                     String createdByType,
                                     String businessIdentifier,
+                                    String individualIdentifier,
                                     PdpoCategory category) {
 }
