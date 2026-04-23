@@ -138,7 +138,8 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
         }
 
         String businessIdentifier = normalizedOrNull(request.getBusinessIdentifier());
-        if (createdByIdentifier == null && businessIdentifier == null) {
+        String individualId = normalizedOrNull(request.getIndividualId());
+        if (createdByIdentifier == null && businessIdentifier == null && individualId == null) {
             throw badRequest("At least one search parameter must be provided");
         }
 
@@ -147,7 +148,13 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
             category = PdpoCategory.valueOf(request.getCategory().name());
         }
 
-        return new PdpoLogSearchCriteria(createdByIdentifier, createdByType, businessIdentifier, category);
+        return new PdpoLogSearchCriteria(
+            createdByIdentifier,
+            createdByType,
+            businessIdentifier,
+            individualId,
+            category
+        );
     }
 
     private ResponseStatusException badRequest(String message) {

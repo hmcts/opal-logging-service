@@ -71,13 +71,44 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
     void searchByBusinessIdentifierReturnsSortedLogs() throws Exception {
         persistLog("requestor-2", "EXTERNAL_SERVICE", "SHARING",
             PdpoCategory.COLLECTION, null, null,
-            OffsetDateTime.parse("2025-11-15T10:00:00Z"));
+            OffsetDateTime.parse("2025-11-15T10:00:00Z"), "subject-1");
         persistLog("requestor-1", "OPAL_USER_ID", "SHARING",
             PdpoCategory.COLLECTION, null, null,
-            OffsetDateTime.parse("2025-11-15T12:00:00Z"));
+            OffsetDateTime.parse("2025-11-15T12:00:00Z"), "subject-1");
 
         SearchPdpoLogRequest request = new SearchPdpoLogRequest()
             .businessIdentifier("SHARING");
+
+        MvcResult result = mockMvc.perform(post("/test-support/search")
+                                               .contentType(APPLICATION_JSON_VALUE)
+                                               .content(objectMapper.writeValueAsBytes(request)))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        List<AddPdpoLogResponse> logs = objectMapper.readValue(
+            result.getResponse().getContentAsByteArray(),
+            new TypeReference<>() {
+            });
+
+        assertThat(logs).hasSize(2);
+        assertThat(logs.getFirst().getCreatedBy().getId()).isEqualTo("requestor-1");
+        assertThat(logs.get(1).getCreatedBy().getId()).isEqualTo("requestor-2");
+    }
+
+    @Test
+    void searchByIndividualIdReturnsSortedLogs() throws Exception {
+        persistLog("requestor-2", "EXTERNAL_SERVICE", "SHARING",
+                   PdpoCategory.COLLECTION, null, null,
+                   OffsetDateTime.parse("2025-11-15T10:00:00Z"), "subject-1");
+        persistLog("requestor-1", "OPAL_USER_ID", "SHARING",
+                   PdpoCategory.COLLECTION, null, null,
+                   OffsetDateTime.parse("2025-11-15T12:00:00Z"), "subject-1");
+        persistLog("requestor-3", "OPAL_USER_ID", "SHARING",
+                   PdpoCategory.COLLECTION, null, null,
+                   OffsetDateTime.parse("2025-11-15T12:00:00Z"), "subject-2");
+
+        SearchPdpoLogRequest request = new SearchPdpoLogRequest()
+            .individualId("subject-1");
 
         MvcResult result = mockMvc.perform(post("/test-support/search")
                                                .contentType(APPLICATION_JSON_VALUE)
@@ -151,7 +182,7 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
                                      String recipientId,
                                      String recipientType) {
         return persistLog(createdBy, createdByType, businessIdentifier, category, recipientId, recipientType,
-            OffsetDateTime.parse("2025-11-15T12:00:00Z"));
+            OffsetDateTime.parse("2025-11-15T12:00:00Z"), "subject-1");
     }
 
     private PdpoLogEntity persistLog(String createdBy,
@@ -160,7 +191,8 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
                                      PdpoCategory category,
                                      String recipientId,
                                      String recipientType,
-                                     OffsetDateTime createdAt) {
+                                     OffsetDateTime createdAt,
+                                     String individualId) {
         PdpoIdentifierEntity identifier = identifierRepository.findByBusinessIdentifier(businessIdentifier)
             .orElseGet(() -> identifierRepository.save(
                 PdpoIdentifierEntity.builder()
@@ -183,7 +215,7 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
         }
 
         log.addIndividual(PdpoLogIndividualEntity.builder()
-            .individualIdentifier("subject-1")
+            .individualIdentifier(individualId)
             .individualType("DEFENDANT")
             .build());
 

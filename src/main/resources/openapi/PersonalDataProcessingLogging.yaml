@@ -251,6 +251,11 @@ components:
           type: string
           minLength: 1
           maxLength: 250
+        individual_id:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Unique identifier for the individual user/entity.
         category:
           type: string
           enum:
