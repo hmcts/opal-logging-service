@@ -63,6 +63,7 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
         assertThat(logs).hasSize(1);
         AddPdpoLogResponse response = logs.getFirst();
         assertThat(response.getCreatedBy().getId()).isEqualTo("requestor-1");
+        assertThat(response.getRecipient()).isNotNull();
         assertThat(response.getRecipient().getId()).isEqualTo("recipient-1");
         assertThat(response.getIndividuals()).hasSize(1);
     }
@@ -175,24 +176,24 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
             .andExpect(status().isBadRequest());
     }
 
-    private PdpoLogEntity persistLog(String createdBy,
-                                     String createdByType,
-                                     String businessIdentifier,
-                                     PdpoCategory category,
-                                     String recipientId,
-                                     String recipientType) {
-        return persistLog(createdBy, createdByType, businessIdentifier, category, recipientId, recipientType,
+    private void persistLog(String createdBy,
+                            String createdByType,
+                            String businessIdentifier,
+                            PdpoCategory category,
+                            String recipientId,
+                            String recipientType) {
+        persistLog(createdBy, createdByType, businessIdentifier, category, recipientId, recipientType,
             OffsetDateTime.parse("2025-11-15T12:00:00Z"), "subject-1");
     }
 
-    private PdpoLogEntity persistLog(String createdBy,
-                                     String createdByType,
-                                     String businessIdentifier,
-                                     PdpoCategory category,
-                                     String recipientId,
-                                     String recipientType,
-                                     OffsetDateTime createdAt,
-                                     String individualId) {
+    private void persistLog(String createdBy,
+                            String createdByType,
+                            String businessIdentifier,
+                            PdpoCategory category,
+                            String recipientId,
+                            String recipientType,
+                            OffsetDateTime createdAt,
+                            String individualId) {
         PdpoIdentifierEntity identifier = identifierRepository.findByBusinessIdentifier(businessIdentifier)
             .orElseGet(() -> identifierRepository.save(
                 PdpoIdentifierEntity.builder()
@@ -204,7 +205,7 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
             .createdByIdentifier(createdBy)
             .createdByIdentifierType(createdByType)
             .createdAt(createdAt)
-            .ipAddress("192.168.0.1")
+            .ipAddress("192.168.1.10")
             .category(category)
             .businessIdentifier(identifier)
             .build();
@@ -219,6 +220,6 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
             .individualType("DEFENDANT")
             .build());
 
-        return logRepository.save(log);
+        logRepository.save(log);
     }
 }

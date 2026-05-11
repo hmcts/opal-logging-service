@@ -129,6 +129,19 @@ tasks.register('functional', Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+  useJUnitPlatform {
+    excludeTags 'R1AOff'
+  }
+}
+
+tasks.register('functionalToggle', Test) {
+  description = "Runs feature toggle functional tests"
+  group = "Verification"
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
+  useJUnitPlatform {
+    includeTags 'R1AOff'
+  }
 }
 
 tasks.register('integration', Test) {
@@ -193,7 +206,7 @@ repositories {
 ext {
   log4JVersion = "2.26.0"
   logbackVersion = "1.5.32"
-  nettyVersion = "4.1.129.Final"
+  nettyVersion = "4.1.132.Final"
 }
 
 ext['netty.version'] = nettyVersion
@@ -204,6 +217,7 @@ dependencies {
   openapiImplementation "io.swagger.core.v3:swagger-models:2.2.48"
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.48"
   openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3"
+  openapiImplementation "org.mozilla:rhino:1.7.14.1"
 
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -293,7 +307,7 @@ tasks.withType(Checkstyle).configureEach {
   exclude '**/build/generated/**'
 }
 tasks.named("checkstyleMain").configure {
-  def manualMainDirs = sourceSets.main.java.srcDirs.findAll { !it.toPath().startsWith(buildDir.toPath()) }
+  def manualMainDirs = sourceSets.main.java.srcDirs.findAll { !it.toPath().startsWith(layout.buildDirectory.asFile.get().toPath()) }
   setSource(files(manualMainDirs))
 }
 tasks.register('runAllStyleChecks') {

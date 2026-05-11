@@ -8,6 +8,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -21,9 +22,25 @@ public final class TestHttpClient {
     }
 
     public static Response get(String url) throws IOException, GeneralSecurityException {
+        return request("GET", url, null, null);
+    }
+
+    public static Response postJson(String url, byte[] body) throws IOException, GeneralSecurityException {
+        return request("POST", url, body, "application/json");
+    }
+
+    private static Response request(String method,
+                                    String url,
+                                    byte[] body,
+                                    String contentType) throws IOException, GeneralSecurityException {
         HttpURLConnection connection = (HttpURLConnection) URI.create(url).toURL().openConnection();
-        connection.setRequestMethod("GET");
+        connection.setRequestMethod(method);
         connection.setRequestProperty("Accept", "application/json");
+
+        if (body != null) {
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", contentType);
+        }
 
         if (connection instanceof HttpsURLConnection httpsConnection) {
             SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -33,11 +50,17 @@ public final class TestHttpClient {
             httpsConnection.setHostnameVerifier(new PermissiveHostnameVerifier());
         }
 
+        if (body != null) {
+            try (OutputStream outputStream = connection.getOutputStream()) {
+                outputStream.write(body);
+            }
+        }
+
         int status = connection.getResponseCode();
         InputStream bodyStream = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-        String body = bodyStream == null ? "" : new String(bodyStream.readAllBytes(), StandardCharsets.UTF_8);
+        String responseBody = bodyStream == null ? "" : new String(bodyStream.readAllBytes(), StandardCharsets.UTF_8);
         connection.disconnect();
-        return new Response(status, body);
+        return new Response(status, responseBody);
     }
 
     public record Response(int statusCode, String body) {
