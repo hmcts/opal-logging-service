@@ -39,7 +39,7 @@ services:
       - sb-emulator
   opal-logging-db:
     container_name: opal-logging-db
-    image: postgres:16.9
+    image: postgres:17
     restart: always
     environment:
       - POSTGRES_DB=opal-logging-db
