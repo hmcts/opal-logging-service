@@ -129,9 +129,7 @@ tasks.register('functional', Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
-  useJUnitPlatform {
-    excludeTags 'R1AOff'
-  }
+  include '**/FunctionalTestSuite.class'
 }
 
 tasks.register('functionalToggle', Test) {
@@ -139,9 +137,7 @@ tasks.register('functionalToggle', Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
-  useJUnitPlatform {
-    includeTags 'R1AOff'
-  }
+  include '**/FunctionalToggleTestSuite.class'
 }
 
 tasks.register('integration', Test) {
@@ -254,6 +250,8 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-testcontainers'
   testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
   testImplementation 'org.testcontainers:testcontainers-postgresql'
+  functionalTestImplementation 'org.junit.platform:junit-platform-suite-api'
+  functionalTestRuntimeOnly 'org.junit.platform:junit-platform-suite-engine'
 
   //Added to override dependency version to resolve vulnerability
   implementation 'org.apache.commons:commons-lang3:3.20.0'
