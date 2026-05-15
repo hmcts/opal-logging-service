@@ -27,5 +27,11 @@ java:
   environment:
     SERVICEBUS_LOGGING_PDPL_PROTOCOL: amqps
     SERVICEBUS_IDLE_TIMEOUT_MS: 30000
+    RUN_DB_MIGRATION_ON_STARTUP: true
+    FLYWAY_LOCATIONS: classpath:db/migration/ddl,classpath:db/migration/data/allEnvs
+  postgresql:
+    enabled: false
+    image:
+      tag: '17.5.0'
 servicebus:
   enabled: false
