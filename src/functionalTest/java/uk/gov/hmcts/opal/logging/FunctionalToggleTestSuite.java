@@ -8,6 +8,6 @@ import org.junit.platform.suite.api.Suite;
 @Suite
 @SelectPackages("uk.gov.hmcts.opal.logging.controllers")
 @IncludeClassNamePatterns(".*FunctionalTest")
-@IncludeTags({"R1AOn", "R1AOff"})
+@IncludeTags("R1AOff")
 public class FunctionalToggleTestSuite {
 }

@@ -142,14 +142,16 @@ Run the normal functional suite with:
 ./gradlew functional
 ```
 
-This task runs the standard functional checks and the `R1AOn` release-1a coverage. It excludes the
-`R1AOff` toggle scenarios.
+This task runs the standard functional checks only. It excludes the release-1a toggle scenarios.
+This task also includes the `R1AOn` release-1a coverage.
 
-Run the isolated release-1a-off toggle coverage with:
+Run the isolated release-1a toggle coverage with:
 
 ```bash
 ./gradlew functionalToggle
 ```
+
+This task runs the isolated `R1AOff` release-1a toggle coverage.
 
 Functional tests start the application on a random local port by default. Set `TEST_URL` only when
 you need the HTTP-level checks to target an already running instance instead of the in-process test
