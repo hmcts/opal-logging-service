@@ -18,7 +18,7 @@ plugins {
     See https://github.com/hmcts/gradle-java-plugin
  */
   id 'uk.gov.hmcts.java' version '0.12.68'
-  id "org.openapi.generator" version "7.21.0"
+  id "org.openapi.generator" version "7.22.0"
 }
 
 application {
@@ -186,6 +186,12 @@ dependencyUpdates {
   }
 }
 
+dependencyManagement {
+  imports {
+    mavenBom "io.netty:netty-bom:4.1.133.Final"
+  }
+}
+
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
   suppressionFile = 'config/owasp/suppressions.xml'
@@ -205,13 +211,13 @@ ext {
   nettyVersion = "4.1.132.Final"
 }
 
-ext['netty.version'] = nettyVersion
+ext['tomcat.version'] = '11.0.22'
 ext['snakeyaml.version'] = '2.0'
 
 dependencies {
-  openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.40"
-  openapiImplementation "io.swagger.core.v3:swagger-models:2.2.48"
-  openapiImplementation "io.swagger.core.v3:swagger-core:2.2.48"
+  openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.42"
+  openapiImplementation "io.swagger.core.v3:swagger-models:2.2.50"
+  openapiImplementation "io.swagger.core.v3:swagger-core:2.2.50"
   openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3"
   openapiImplementation "org.mozilla:rhino:1.7.14.1"
 
