@@ -205,6 +205,13 @@ dependencies {
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.48"
   openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.2"
 
+  implementation('uk.gov.hmcts:opal-common-lib:0.3.8') {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-data-redis'
+    exclude group: 'org.springframework.cloud', module: 'spring-cloud-starter-openfeign'
+    exclude group: 'org.springframework.security', module: 'spring-security-web'
+    exclude group: 'org.springframework.security', module: 'spring-security-oauth2-jose'
+    exclude group: 'org.springframework.security', module: 'spring-security-oauth2-resource-server'
+  }
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.springframework.boot:spring-boot-starter-aspectj'
