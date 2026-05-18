@@ -17,7 +17,7 @@ plugins {
     Applies analysis tools including checkstyle and OWASP Dependency checker.
     See https://github.com/hmcts/gradle-java-plugin
  */
-  id 'uk.gov.hmcts.java' version '0.12.68'
+  id 'uk.gov.hmcts.java' version '0.12.70'
   id "org.openapi.generator" version "7.21.0"
 }
 
@@ -210,7 +210,7 @@ dependencies {
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.48"
   openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3"
 
-  implementation('uk.gov.hmcts:opal-common-lib:0.3.8') {
+  implementation('uk.gov.hmcts:opal-common-lib:0.3.10') {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-data-redis'
     exclude group: 'org.springframework.cloud', module: 'spring-cloud-starter-openfeign'
     exclude group: 'org.springframework.security', module: 'spring-security-web'
