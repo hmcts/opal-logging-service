@@ -19,7 +19,7 @@ java:
     OPAL_LOGGING_DB_USERNAME: "{{ .Values.global.postgresUsername}}"
     OPAL_LOGGING_DB_OPTIONS: "{{ .Values.global.postgresOptions}}"
     OPAL_LOGGING_DB_PASSWORD: "{{ .Values.global.postgresPassword}}"
-
+    OPAL_LOGGING_TEST_SUPPORT_ENABLED: true
     SERVICEBUS_LOGGING_PDPL_QUEUE_NAME: "{{ .Release.Name}}-servicebus-logging-pdpl"
     APPLICATIONINSIGHTS_ROLE_NAME: "opal-logging-service-pr-${CHANGE_ID}"
     LAUNCH_DARKLY_ENABLED: false
