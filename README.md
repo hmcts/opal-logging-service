@@ -134,6 +134,29 @@ Enable the test-support REST endpoints (disabled by default):
 
 - `OPAL_LOGGING_TEST_SUPPORT_ENABLED=true`
 
+## Functional tests
+
+Run the normal functional suite with:
+
+```bash
+./gradlew functional
+```
+
+This task runs the standard functional checks only. It excludes the release-1a toggle scenarios.
+This task also includes the `R1AOn` release-1a coverage.
+
+Run the isolated release-1a toggle coverage with:
+
+```bash
+./gradlew functionalToggle
+```
+
+This task runs the isolated `R1AOff` release-1a toggle coverage.
+
+Functional tests start the application on a random local port by default. Set `TEST_URL` only when
+you need the HTTP-level checks to target an already running instance instead of the in-process test
+application.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

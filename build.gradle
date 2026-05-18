@@ -129,6 +129,15 @@ tasks.register('functional', Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+  include '**/FunctionalTestSuite.class'
+}
+
+tasks.register('functionalToggle', Test) {
+  description = "Runs feature toggle functional tests"
+  group = "Verification"
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
+  include '**/FunctionalToggleTestSuite.class'
 }
 
 tasks.register('integration', Test) {
@@ -199,6 +208,7 @@ repositories {
 ext {
   log4JVersion = "2.26.0"
   logbackVersion = "1.5.32"
+  nettyVersion = "4.1.132.Final"
 }
 
 ext['tomcat.version'] = '11.0.22'
@@ -209,6 +219,7 @@ dependencies {
   openapiImplementation "io.swagger.core.v3:swagger-models:2.2.50"
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.50"
   openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3"
+  openapiImplementation "org.mozilla:rhino:1.7.14.1"
 
   implementation('uk.gov.hmcts:opal-common-lib:0.3.8') {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-data-redis'
@@ -252,6 +263,8 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-testcontainers'
   testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
   testImplementation 'org.testcontainers:testcontainers-postgresql'
+  functionalTestImplementation 'org.junit.platform:junit-platform-suite-api'
+  functionalTestRuntimeOnly 'org.junit.platform:junit-platform-suite-engine'
 
   //Added to override dependency version to resolve vulnerability
   implementation 'org.apache.commons:commons-lang3:3.20.0'
@@ -305,7 +318,7 @@ tasks.withType(Checkstyle).configureEach {
   exclude '**/build/generated/**'
 }
 tasks.named("checkstyleMain").configure {
-  def manualMainDirs = sourceSets.main.java.srcDirs.findAll { !it.toPath().startsWith(buildDir.toPath()) }
+  def manualMainDirs = sourceSets.main.java.srcDirs.findAll { !it.toPath().startsWith(layout.buildDirectory.asFile.get().toPath()) }
   setSource(files(manualMainDirs))
 }
 tasks.register('runAllStyleChecks') {
