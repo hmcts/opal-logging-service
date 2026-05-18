@@ -29,6 +29,7 @@ public interface PersonalDataProcessingLogMapper {
 
     @Named("createdBy")
     default ParticipantIdentifier mapCreatedBy(PdpoLogEntity entity) {
+
         return new ParticipantIdentifier()
             .id(entity.getCreatedByIdentifier())
             .type(entity.getCreatedByIdentifierType());
@@ -36,6 +37,7 @@ public interface PersonalDataProcessingLogMapper {
 
     @Named("recipient")
     default ParticipantIdentifier mapRecipient(PdpoLogEntity entity) {
+
         if (entity.getRecipientIdentifier() == null) {
             return null;
         }
@@ -45,6 +47,7 @@ public interface PersonalDataProcessingLogMapper {
     }
 
     default AddPdpoLogResponse.CategoryEnum mapCategory(PdpoCategory category) {
+
         if (category == null) {
             return null;
         }
@@ -64,9 +67,8 @@ public interface PersonalDataProcessingLogMapper {
         };
     }
 
-    default List<ParticipantIdentifier> mapIndividuals(
-        List<PdpoLogIndividualEntity> individuals
-    ) {
+    default List<ParticipantIdentifier> mapIndividuals(List<PdpoLogIndividualEntity> individuals) {
+
         return individuals == null ? List.of() : individuals.stream()
             .map(individual -> new ParticipantIdentifier()
                 .id(individual.getIndividualIdentifier())

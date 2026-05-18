@@ -1,10 +1,14 @@
 package uk.gov.hmcts.opal.logging.controllers;
 
+import static uk.gov.hmcts.opal.logging.util.FeatureFlags.RELEASE_1A;
+import static uk.gov.hmcts.opal.logging.util.FeatureFlags.RELEASE_1A_ENABLED_PROPERTY;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.opal.common.launchdarkly.FeatureToggle;
 import uk.gov.hmcts.opal.logging.generated.http.api.LogApi;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogResponse;
@@ -24,9 +28,8 @@ public class PersonalDataProcessingLogController implements LogApi {
     private final PersonalDataProcessingLogMapper mapper;
 
     @Override
-    public ResponseEntity<AddPdpoLogResponse> logPdpoPost(
-        AddPdpoLogRequest request
-    ) {
+    @FeatureToggle(feature = RELEASE_1A, defaultValueProperty = RELEASE_1A_ENABLED_PROPERTY)
+    public ResponseEntity<AddPdpoLogResponse> logPdpoPost(AddPdpoLogRequest request) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(mapper.toDto(logService.recordLog(request)));

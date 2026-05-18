@@ -6,8 +6,5 @@ import uk.gov.hmcts.opal.logging.domain.PdpoCategory;
  * Normalised filters supplied to {@link PdpoLogSpecifications}.
  */
 public record PdpoLogSearchCriteria(String createdByIdentifier,
-                                    String createdByType,
-                                    String businessIdentifier,
-                                    String individualIdentifier,
-                                    PdpoCategory category) {
+    String createdByType, String businessIdentifier, String individualIdentifier, PdpoCategory category) {
 }

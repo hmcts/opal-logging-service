@@ -14,10 +14,9 @@ public class PdplQueueListener {
 
     private final PdpoQueueConsumer consumer;
 
-    @JmsListener(
-        destination = "${opal.logging.pdpl.consumer.queue-name}",
-        containerFactory = "pdplListenerContainerFactory"
-    )
+    @JmsListener(destination = "${opal.logging.pdpl.consumer.queue-name}",
+        containerFactory = "pdplListenerContainerFactory")
+
     public void onMessage(String messagePayload) {
         log.debug("PDPL queue message received payload={}", messagePayload);
         consumer.consume(messagePayload);

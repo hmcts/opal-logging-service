@@ -18,7 +18,7 @@ import uk.gov.hmcts.opal.logging.persistence.repository.PdpoLogRepository;
 import uk.gov.hmcts.opal.logging.testsupport.AbstractIntegrationTest;
 
 @TestPropertySource(properties = "opal.logging.test-support.enabled=false")
-class PersonalDataProcessingLogControllerToggleIntegrationTest extends AbstractIntegrationTest {
+class PdpLogControllerToggleIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private PdpoLogRepository logRepository;

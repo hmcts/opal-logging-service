@@ -10,14 +10,13 @@ import uk.gov.hmcts.opal.logging.generated.dto.SearchPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.testsupport.AbstractIntegrationTest;
 
 @TestPropertySource(properties = "opal.logging.test-support.enabled=false")
-class TestSupportPersonalDataProcessingLogControllerToggleIntegrationTest extends AbstractIntegrationTest {
+class TestSupportPdpLogControllerToggleIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void endpointReturnsNotFoundWhenToggleDisabled() throws Exception {
-        mockMvc.perform(post("/test-support/search")
-                            .contentType(APPLICATION_JSON_VALUE)
-                            .content(objectMapper.writeValueAsBytes(new SearchPdpoLogRequest()
-                                                                     .businessIdentifier("ACME"))))
+        mockMvc.perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
+                            .content(objectMapper.writeValueAsBytes(
+                                new SearchPdpoLogRequest().businessIdentifier("ACME"))))
             .andExpect(status().isNotFound());
     }
 }

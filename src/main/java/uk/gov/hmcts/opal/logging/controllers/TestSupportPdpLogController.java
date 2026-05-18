@@ -1,10 +1,14 @@
 package uk.gov.hmcts.opal.logging.controllers;
 
+import static uk.gov.hmcts.opal.logging.util.FeatureFlags.RELEASE_1A;
+import static uk.gov.hmcts.opal.logging.util.FeatureFlags.RELEASE_1A_ENABLED_PROPERTY;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.opal.common.launchdarkly.FeatureToggle;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogResponse;
 import uk.gov.hmcts.opal.logging.generated.dto.SearchPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.generated.http.api.TestSupportApi;
@@ -17,17 +21,17 @@ import uk.gov.hmcts.opal.logging.service.PersonalDataProcessingLogService;
 @RestController
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "opal.logging.test-support.enabled", havingValue = "true")
-public class TestSupportPersonalDataProcessingLogController implements TestSupportApi {
+public class TestSupportPdpLogController implements TestSupportApi {
 
     private final PersonalDataProcessingLogService logService;
     private final PersonalDataProcessingLogMapper mapper;
 
     @Override
+    @FeatureToggle(feature = RELEASE_1A, defaultValueProperty = RELEASE_1A_ENABLED_PROPERTY)
     public ResponseEntity<List<AddPdpoLogResponse>> testSupportSearchPost(SearchPdpoLogRequest request) {
         return ResponseEntity.ok(
             logService.searchLogs(request).stream()
                 .map(mapper::toDto)
-                .toList()
-        );
+                .toList());
     }
 }

@@ -39,3 +39,5 @@ testcontainers:
 
 launchdarkly:
   enabled: false
+  default-flag-values:
+    release-1a: true

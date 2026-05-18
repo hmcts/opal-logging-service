@@ -29,9 +29,10 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
     private final PdpoLogRepository logRepository;
     private final PdpoLogSpecifications logSpecifications;
 
-    public PersonalDataProcessingLogServiceImpl(PdpoIdentifierRepository identifierRepository,
-                                                PdpoLogRepository logRepository,
-                                                PdpoLogSpecifications logSpecifications) {
+    public PersonalDataProcessingLogServiceImpl(
+        PdpoIdentifierRepository identifierRepository, PdpoLogRepository logRepository,
+        PdpoLogSpecifications logSpecifications) {
+
         this.identifierRepository = identifierRepository;
         this.logRepository = logRepository;
         this.logSpecifications = logSpecifications;
@@ -44,8 +45,7 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
             .orElseGet(() -> identifierRepository.save(
                 PdpoIdentifierEntity.builder()
                     .businessIdentifier(businessIdentifierValue)
-                    .build()
-            ));
+                    .build()));
 
         PdpoCategory category = resolveCategory(details);
 
@@ -148,13 +148,8 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
             category = PdpoCategory.valueOf(request.getCategory().name());
         }
 
-        return new PdpoLogSearchCriteria(
-            createdByIdentifier,
-            createdByType,
-            businessIdentifier,
-            individualId,
-            category
-        );
+        return new PdpoLogSearchCriteria(createdByIdentifier, createdByType,
+                                         businessIdentifier, individualId, category);
     }
 
     private ResponseStatusException badRequest(String message) {
