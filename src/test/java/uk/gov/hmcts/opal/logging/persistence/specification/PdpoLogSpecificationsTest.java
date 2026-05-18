@@ -29,7 +29,7 @@ import uk.gov.hmcts.opal.logging.persistence.repository.PdpoLogRepository;
 class PdpoLogSpecificationsTest {
 
     @Container
-    private static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:16.9")
+    private static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:17")
         .withDatabaseName("opal-logging-spec-test")
         .withUsername("opal-logging")
         .withPassword("opal-logging");
