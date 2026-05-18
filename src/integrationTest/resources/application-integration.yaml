@@ -36,3 +36,6 @@ jpa:
 testcontainers:
   reuse:
     enable: true
+
+launchdarkly:
+  enabled: false
