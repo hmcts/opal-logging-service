@@ -66,10 +66,21 @@ spring:
     url: ${spring.datasource.url}
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
-    locations: ${FLYWAY_LOCATIONS:classpath:db/migration/allEnvs, classpath:db/migration/devOnly, classpath:db/migration/stgOnly}
+    locations: ${FLYWAY_LOCATIONS:classpath:db/migration/ddl, classpath:db/migration/data/allEnvs, classpath:db/migration/data/nle, classpath:db/migration/data/dev}
     baseline-on-migrate: true
     ignoreMigrationPatterns: "*:missing"
+
+dbMigration:
+  # When true, the app will run DB migration on startup.
+  # Otherwise, it will just check if all migrations have been applied (and fail to start if not).
+  runOnStartup: ${RUN_DB_MIGRATION_ON_STARTUP:true}
 
 azure:
   application-insights:
     instrumentation-key: ${opal.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
+
+launchdarkly:
+  sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
+  offline-mode: ${LAUNCH_DARKLY_OFFLINE_MODE:false}
+  env: ${LAUNCH_DARKLY_ENV:default}
+  enabled: ${LAUNCH_DARKLY_ENABLED:true}

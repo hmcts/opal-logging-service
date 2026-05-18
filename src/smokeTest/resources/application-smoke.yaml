@@ -15,7 +15,7 @@ logging:
             init: DEBUG
 # Flyway
 flyway:
-  locations: classpath:db/migration/allEnvs, classpath:db/migration/devOnly
+  locations: classpath:db/migration/ddl, classpath:db/migration/data/allEnvs, classpath:db/migration/data/nle, classpath:db/migration/data/dev
   baseline-on-migrate: true
   ignoreMigrationPatterns: "*:missing"
 
@@ -28,3 +28,6 @@ jpa:
 testcontainers:
   reuse:
     enable: true
+
+launchdarkly:
+  enabled: false

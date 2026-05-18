@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(
     scanBasePackages = {
         "uk.gov.hmcts.opal.logging",
+        "uk.gov.hmcts.opal.common.launchdarkly",
         "uk.gov.hmcts.common",
     }
 )
