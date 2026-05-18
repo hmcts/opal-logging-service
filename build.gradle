@@ -177,6 +177,12 @@ dependencyUpdates {
   }
 }
 
+dependencyManagement {
+  imports {
+    mavenBom "io.netty:netty-bom:4.1.133.Final"
+  }
+}
+
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
   suppressionFile = 'config/owasp/suppressions.xml'
@@ -193,10 +199,9 @@ repositories {
 ext {
   log4JVersion = "2.26.0"
   logbackVersion = "1.5.32"
-  nettyVersion = "4.1.129.Final"
 }
 
-ext['netty.version'] = nettyVersion
+ext['tomcat.version'] = '11.0.22'
 ext['snakeyaml.version'] = '2.0'
 
 dependencies {
