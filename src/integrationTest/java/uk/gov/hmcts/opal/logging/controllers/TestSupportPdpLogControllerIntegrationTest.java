@@ -25,7 +25,7 @@ import uk.gov.hmcts.opal.logging.persistence.repository.PdpoLogRepository;
 import uk.gov.hmcts.opal.logging.testsupport.AbstractIntegrationTest;
 
 @TestPropertySource(properties = "opal.logging.test-support.enabled=true")
-class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends AbstractIntegrationTest {
+class TestSupportPdpLogControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private PdpoLogRepository logRepository;
@@ -49,16 +49,13 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
         SearchPdpoLogRequest request = new SearchPdpoLogRequest()
             .createdBy(new ParticipantIdentifier().id("requestor-1").type("OPAL_USER_ID"));
 
-        MvcResult result = mockMvc.perform(post("/test-support/search")
-                                               .contentType(APPLICATION_JSON_VALUE)
-                                               .content(objectMapper.writeValueAsBytes(request)))
-            .andExpect(status().isOk())
-            .andReturn();
+        MvcResult result = mockMvc
+            .perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
+                         .content(objectMapper.writeValueAsBytes(request)))
+            .andExpect(status().isOk()).andReturn();
 
         List<AddPdpoLogResponse> logs = objectMapper.readValue(
-            result.getResponse().getContentAsByteArray(),
-            new TypeReference<>() {
-            });
+            result.getResponse().getContentAsByteArray(), new TypeReference<>() {});
 
         assertThat(logs).hasSize(1);
         AddPdpoLogResponse response = logs.getFirst();
@@ -77,19 +74,15 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
             PdpoCategory.COLLECTION, null, null,
             OffsetDateTime.parse("2025-11-15T12:00:00Z"), "subject-1");
 
-        SearchPdpoLogRequest request = new SearchPdpoLogRequest()
-            .businessIdentifier("SHARING");
+        SearchPdpoLogRequest request = new SearchPdpoLogRequest().businessIdentifier("SHARING");
 
-        MvcResult result = mockMvc.perform(post("/test-support/search")
-                                               .contentType(APPLICATION_JSON_VALUE)
-                                               .content(objectMapper.writeValueAsBytes(request)))
-            .andExpect(status().isOk())
-            .andReturn();
+        MvcResult result = mockMvc
+            .perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
+                         .content(objectMapper.writeValueAsBytes(request)))
+            .andExpect(status().isOk()).andReturn();
 
         List<AddPdpoLogResponse> logs = objectMapper.readValue(
-            result.getResponse().getContentAsByteArray(),
-            new TypeReference<>() {
-            });
+            result.getResponse().getContentAsByteArray(), new TypeReference<>() {});
 
         assertThat(logs).hasSize(2);
         assertThat(logs.getFirst().getCreatedBy().getId()).isEqualTo("requestor-1");
@@ -111,16 +104,13 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
         SearchPdpoLogRequest request = new SearchPdpoLogRequest()
             .individualId("subject-1");
 
-        MvcResult result = mockMvc.perform(post("/test-support/search")
-                                               .contentType(APPLICATION_JSON_VALUE)
-                                               .content(objectMapper.writeValueAsBytes(request)))
-            .andExpect(status().isOk())
-            .andReturn();
+        MvcResult result = mockMvc
+            .perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
+                         .content(objectMapper.writeValueAsBytes(request)))
+            .andExpect(status().isOk()).andReturn();
 
         List<AddPdpoLogResponse> logs = objectMapper.readValue(
-            result.getResponse().getContentAsByteArray(),
-            new TypeReference<>() {
-            });
+            result.getResponse().getContentAsByteArray(), new TypeReference<>() {});
 
         assertThat(logs).hasSize(2);
         assertThat(logs.getFirst().getCreatedBy().getId()).isEqualTo("requestor-1");
@@ -140,16 +130,13 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
             .businessIdentifier("MATCH")
             .category(SearchPdpoLogRequest.CategoryEnum.DISCLOSURE);
 
-        MvcResult result = mockMvc.perform(post("/test-support/search")
-                                               .contentType(APPLICATION_JSON_VALUE)
-                                               .content(objectMapper.writeValueAsBytes(request)))
-            .andExpect(status().isOk())
-            .andReturn();
+        MvcResult result = mockMvc
+            .perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
+                         .content(objectMapper.writeValueAsBytes(request)))
+            .andExpect(status().isOk()).andReturn();
 
         List<AddPdpoLogResponse> logs = objectMapper.readValue(
-            result.getResponse().getContentAsByteArray(),
-            new TypeReference<>() {
-            });
+            result.getResponse().getContentAsByteArray(), new TypeReference<>() {});
 
         assertThat(logs).hasSize(1);
         AddPdpoLogResponse response = logs.getFirst();
@@ -162,44 +149,32 @@ class TestSupportPersonalDataProcessingLogControllerIntegrationTest extends Abst
         SearchPdpoLogRequest invalidRequest = new SearchPdpoLogRequest()
             .createdBy(new ParticipantIdentifier().id("requestor-1"));
 
-        mockMvc.perform(post("/test-support/search")
-                            .contentType(APPLICATION_JSON_VALUE)
+        mockMvc.perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsBytes(invalidRequest)))
             .andExpect(status().isBadRequest());
     }
 
     @Test
     void missingAllFiltersReturnsBadRequest() throws Exception {
-        mockMvc.perform(post("/test-support/search")
-                            .contentType(APPLICATION_JSON_VALUE)
+        mockMvc.perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsBytes(new SearchPdpoLogRequest())))
             .andExpect(status().isBadRequest());
     }
 
-    private void persistLog(String createdBy,
-                            String createdByType,
-                            String businessIdentifier,
-                            PdpoCategory category,
-                            String recipientId,
-                            String recipientType) {
+    private void persistLog(String createdBy, String createdByType, String businessIdentifier, PdpoCategory category,
+                            String recipientId, String recipientType) {
+
         persistLog(createdBy, createdByType, businessIdentifier, category, recipientId, recipientType,
             OffsetDateTime.parse("2025-11-15T12:00:00Z"), "subject-1");
     }
 
-    private void persistLog(String createdBy,
-                            String createdByType,
-                            String businessIdentifier,
-                            PdpoCategory category,
-                            String recipientId,
-                            String recipientType,
-                            OffsetDateTime createdAt,
-                            String individualId) {
+    private void persistLog(String createdBy, String createdByType, String businessIdentifier, PdpoCategory category,
+                            String recipientId, String recipientType, OffsetDateTime createdAt, String individualId) {
         PdpoIdentifierEntity identifier = identifierRepository.findByBusinessIdentifier(businessIdentifier)
             .orElseGet(() -> identifierRepository.save(
                 PdpoIdentifierEntity.builder()
                     .businessIdentifier(businessIdentifier)
-                    .build()
-            ));
+                    .build()));
 
         PdpoLogEntity log = PdpoLogEntity.builder()
             .createdByIdentifier(createdBy)

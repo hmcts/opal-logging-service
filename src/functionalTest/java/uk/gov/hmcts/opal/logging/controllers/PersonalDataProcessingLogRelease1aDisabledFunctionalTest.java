@@ -15,7 +15,7 @@ import uk.gov.hmcts.opal.logging.testsupport.TestHttpClient;
 @TestPropertySource(properties = {
     "opal.logging.test-support.enabled=true",
     "launchdarkly.enabled=false",
-    "features.release-1a.enabled=false"
+    "launchdarkly.default-flag-values.release-1a=false"
 })
 class PersonalDataProcessingLogRelease1aDisabledFunctionalTest extends AbstractRelease1aFeatureToggleFunctionalTest {
 

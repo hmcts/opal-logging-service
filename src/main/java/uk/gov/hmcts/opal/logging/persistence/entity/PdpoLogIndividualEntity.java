@@ -29,11 +29,7 @@ public class PdpoLogIndividualEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pdpo_log_individuals_seq")
-    @SequenceGenerator(
-        name = "pdpo_log_individuals_seq",
-        sequenceName = "pdpo_log_individuals_seq",
-        allocationSize = 1
-    )
+    @SequenceGenerator(name = "pdpo_log_individuals_seq", sequenceName = "pdpo_log_individuals_seq", allocationSize = 1)
     @Column(name = "pdpo_log_individuals_id")
     @EqualsAndHashCode.Include
     private Long id;

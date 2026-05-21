@@ -2,6 +2,8 @@ package uk.gov.hmcts.opal.logging;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Import;
+import uk.gov.hmcts.opal.common.controllers.advice.OpalGlobalExceptionHandler;
 
 @SpringBootApplication(
     scanBasePackages = {
@@ -10,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         "uk.gov.hmcts.common",
     }
 )
+@Import(OpalGlobalExceptionHandler.class)
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {
 

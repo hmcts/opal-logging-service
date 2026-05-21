@@ -25,8 +25,7 @@ public class PdplConsumerJmsConfig {
         String remoteUri = "%s://%s?amqp.idleTimeout=%d".formatted(
             properties.getProtocol(),
             details.fullyQualifiedNamespace(),
-            properties.getIdleTimeoutMs()
-        );
+            properties.getIdleTimeoutMs());
 
         JmsConnectionFactory qpidFactory = new JmsConnectionFactory(remoteUri);
         qpidFactory.setUsername(details.sharedAccessKeyName());
@@ -37,8 +36,8 @@ public class PdplConsumerJmsConfig {
 
     @Bean
     public DefaultJmsListenerContainerFactory pdplListenerContainerFactory(
-        ConnectionFactory pdplConsumerConnectionFactory
-    ) {
+        ConnectionFactory pdplConsumerConnectionFactory) {
+
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(pdplConsumerConnectionFactory);
         factory.setSessionAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);

@@ -24,8 +24,7 @@ public class PdpoLogSpecifications extends EntitySpecs<PdpoLogEntity> {
             createdByFilter(criteria),
             notBlank(criteria.businessIdentifier()).map(PdpoLogSpecifications::businessIdentifier),
             notBlank(criteria.individualIdentifier()).map(PdpoLogSpecifications::individualIdentifier),
-            notNull(criteria.category()).map(PdpoLogSpecifications::category)
-        ));
+            notNull(criteria.category()).map(PdpoLogSpecifications::category)));
     }
 
     private Optional<Specification<PdpoLogEntity>> createdByFilter(PdpoLogSearchCriteria criteria) {
@@ -37,8 +36,7 @@ public class PdpoLogSpecifications extends EntitySpecs<PdpoLogEntity> {
     private static Specification<PdpoLogEntity> createdBy(String identifier, String type) {
         return (root, query, cb) -> cb.and(
             cb.equal(root.get("createdByIdentifier"), identifier),
-            cb.equal(root.get("createdByIdentifierType"), type)
-        );
+            cb.equal(root.get("createdByIdentifierType"), type));
     }
 
     private static Specification<PdpoLogEntity> businessIdentifier(String businessIdentifier) {

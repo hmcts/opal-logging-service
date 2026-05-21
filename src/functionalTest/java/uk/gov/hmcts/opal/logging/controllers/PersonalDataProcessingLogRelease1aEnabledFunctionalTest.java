@@ -18,7 +18,7 @@ import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogResponse;
 @TestPropertySource(properties = {
     "opal.logging.test-support.enabled=true",
     "launchdarkly.enabled=false",
-    "features.release-1a.enabled=true"
+    "launchdarkly.default-flag-values.release-1a=true"
 })
 class PersonalDataProcessingLogRelease1aEnabledFunctionalTest extends AbstractRelease1aFeatureToggleFunctionalTest {
 

@@ -22,8 +22,7 @@ final class ServiceBusConnectionStringParser {
             .map(part -> part.split("=", 2))
             .collect(Collectors.toMap(
                 entry -> entry[0],
-                entry -> entry.length > 1 ? entry[1] : ""
-            ));
+                entry -> entry.length > 1 ? entry[1] : ""));
 
         String endpoint = parts.get("Endpoint");
         if (endpoint == null || endpoint.isBlank()) {
@@ -54,8 +53,6 @@ final class ServiceBusConnectionStringParser {
         return new ConnectionDetails(host, keyName, key);
     }
 
-    record ConnectionDetails(String fullyQualifiedNamespace,
-                             String sharedAccessKeyName,
-                             String sharedAccessKey) {
+    record ConnectionDetails(String fullyQualifiedNamespace, String sharedAccessKeyName, String sharedAccessKey) {
     }
 }

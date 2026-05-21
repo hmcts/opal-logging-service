@@ -3,13 +3,14 @@ package uk.gov.hmcts.opal.logging.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest.CategoryEnum;
@@ -18,8 +19,12 @@ import uk.gov.hmcts.opal.logging.persistence.repository.PdpoIdentifierRepository
 import uk.gov.hmcts.opal.logging.persistence.repository.PdpoLogRepository;
 import uk.gov.hmcts.opal.logging.testsupport.AbstractIntegrationTest;
 
-@TestPropertySource(properties = "opal.logging.test-support.enabled=true")
-class PersonalDataProcessingLogControllerIntegrationTest extends AbstractIntegrationTest {
+@TestPropertySource(properties = {
+    "opal.logging.test-support.enabled=true",
+    "launchdarkly.enabled=false",
+    "launchdarkly.default-flag-values.release-1a=false"
+})
+class PdpoLogRelease1aDisabledIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private PdpoLogRepository logRepository;
@@ -34,24 +39,17 @@ class PersonalDataProcessingLogControllerIntegrationTest extends AbstractIntegra
     }
 
     @Test
-    void validRequestReturnsCreatedAndPersistsLog() throws Exception {
-        mockMvc.perform(post("/log/pdpo")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsBytes(baseRequest())))
-            .andExpect(status().isCreated());
-
-        assertThat(logRepository.count()).isEqualTo(1);
-    }
-
-    @Test
-    void invalidPayloadReturnsBadRequestAndDoesNotPersist() throws Exception {
-        AddPdpoLogRequest invalidRequest = baseRequest()
-            .businessIdentifier(null);
-
-        mockMvc.perform(post("/log/pdpo")
-                            .contentType(APPLICATION_JSON_VALUE)
-                            .content(objectMapper.writeValueAsBytes(invalidRequest)))
-            .andExpect(status().isBadRequest());
+    void returnsMethodNotAllowedWhenRelease1aDisabled() throws Exception {
+        mockMvc
+            .perform(post("/log/pdpo").contentType(APPLICATION_JSON_VALUE)
+                         .content(objectMapper.writeValueAsBytes(baseRequest())))
+            .andExpect(status().isMethodNotAllowed())
+            .andExpect(content().contentTypeCompatibleWith("application/problem+json"))
+            .andExpect(jsonPath("$.title").value("Feature Disabled"))
+            .andExpect(jsonPath("$.detail").value("The requested feature is not currently available"))
+            .andExpect(jsonPath("$.type").value("https://hmcts.gov.uk/problems/feature-disabled"))
+            .andExpect(jsonPath("$.status").value(405))
+            .andExpect(jsonPath("$.retriable").value(false));
 
         assertThat(logRepository.count()).isZero();
     }
@@ -62,8 +60,7 @@ class PersonalDataProcessingLogControllerIntegrationTest extends AbstractIntegra
             .businessIdentifier("SharingCo")
             .createdAt(OffsetDateTime.parse("2025-11-15T12:45:00Z"))
             .ipAddress("192.168.1.10")
-            .category(CategoryEnum.DISCLOSURE)
-            .recipient(new ParticipantIdentifier().id("recipient-42").type("EXTERNAL_SERVICE"))
+            .category(CategoryEnum.COLLECTION)
             .addIndividualsItem(new ParticipantIdentifier().id("person-1").type("DEFENDANT"));
     }
 }
