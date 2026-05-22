@@ -17,7 +17,7 @@ plugins {
     Applies analysis tools including checkstyle and OWASP Dependency checker.
     See https://github.com/hmcts/gradle-java-plugin
  */
-  id 'uk.gov.hmcts.java' version '0.12.68'
+  id 'uk.gov.hmcts.java' version '0.12.70'
   id "org.openapi.generator" version "7.22.0"
 }
 
@@ -213,6 +213,7 @@ ext {
 
 ext['tomcat.version'] = '11.0.22'
 ext['snakeyaml.version'] = '2.0'
+ext['postgresql.version'] = '42.7.11'
 
 dependencies {
   openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.42"
@@ -221,7 +222,7 @@ dependencies {
   openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3"
   openapiImplementation "org.mozilla:rhino:1.9.1"
 
-  implementation('uk.gov.hmcts:opal-common-lib:0.3.8') {
+  implementation('uk.gov.hmcts:opal-common-lib:0.3.12') {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-data-redis'
     exclude group: 'org.springframework.cloud', module: 'spring-cloud-starter-openfeign'
     exclude group: 'org.springframework.security', module: 'spring-security-web'
@@ -233,6 +234,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-aspectj'
   implementation 'org.springframework.boot:spring-boot-starter-json'
   implementation 'org.springframework:spring-jms'
+  implementation 'org.springframework.security:spring-security-core'
+  implementation 'io.github.openfeign:feign-core:13.6'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
 
@@ -243,7 +246,9 @@ dependencies {
   implementation "org.apache.logging.log4j:log4j-to-slf4j:${log4JVersion}"
   implementation "ch.qos.logback:logback-classic:${logbackVersion}"
   implementation "ch.qos.logback:logback-core:${logbackVersion}"
-  implementation 'uk.gov.hmcts:spring-exception-handler:1.0.1'
+  implementation('uk.gov.hmcts:spring-exception-handler:1.0.1') {
+    exclude group: 'com.microsoft.azure', module: 'applicationinsights-spring-boot-starter'
+  }
   implementation 'org.springframework.boot:spring-boot-flyway'
   implementation 'org.flywaydb:flyway-core:12.6.1'
   runtimeOnly 'org.flywaydb:flyway-database-postgresql:12.6.1', {

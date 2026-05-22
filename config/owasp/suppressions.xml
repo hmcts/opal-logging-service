@@ -26,5 +26,18 @@
     <cpe>cpe:2.3:a:validator:validator:*:*:*:*:*:*:*:*</cpe>
     <cve>CVE-2025-15104</cve>
   </suppress>
+  <suppress until="2026-08-31Z">
+    <notes><![CDATA[
+    Reviewed 2026-05-22.
+    CVE-2025-21199 applies to Microsoft Azure Agent Installer products under the CPE family
+    cpe:2.3:a:microsoft:azure_agent:* and the NVD affected-software entries are for the "backup"
+    and "site_recovery" products. This repo contains the Java libraries
+    com.microsoft.azure:applicationinsights-core and com.microsoft.azure:applicationinsights-web,
+    which are being mapped to the generic azure_agent CPE by Dependency-Check.
+    Keep this suppression only for that false-positive CPE match.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/applicationinsights\-(core|web)@.*$</packageUrl>
+    <cve>CVE-2025-21199</cve>
+  </suppress>
   <!--End of false positives section -->
 </suppressions>
