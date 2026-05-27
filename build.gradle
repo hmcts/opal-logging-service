@@ -222,8 +222,9 @@ dependencies {
   openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3"
   openapiImplementation "org.mozilla:rhino:1.9.1"
 
-  implementation('uk.gov.hmcts:opal-common-lib:0.3.12') {
+  implementation('uk.gov.hmcts:opal-common-lib:0.3.13') {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-data-redis'
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-security'
     exclude group: 'org.springframework.cloud', module: 'spring-cloud-starter-openfeign'
     exclude group: 'org.springframework.security', module: 'spring-security-web'
     exclude group: 'org.springframework.security', module: 'spring-security-oauth2-jose'
