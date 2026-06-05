@@ -219,10 +219,10 @@ dependencies {
   openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.43"
   openapiImplementation "io.swagger.core.v3:swagger-models:2.2.50"
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.50"
-  openapiImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.22.0"
+  openapiImplementation "tools.jackson.dataformat:jackson-dataformat-yaml:3.1.2"
   openapiImplementation "org.mozilla:rhino:1.9.1"
 
-  implementation('uk.gov.hmcts:opal-common-lib:0.3.13') {
+  implementation('uk.gov.hmcts:opal-common-lib:0.3.16') {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-data-redis'
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-security'
     exclude group: 'org.springframework.cloud', module: 'spring-cloud-starter-openfeign'
