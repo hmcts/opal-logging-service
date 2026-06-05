@@ -223,6 +223,7 @@ dependencies {
   openapiImplementation "org.mozilla:rhino:1.9.1"
 
   implementation('uk.gov.hmcts:opal-common-lib:0.3.13') {
+    exclude group: 'com.microsoft.azure', module: 'applicationinsights-spring-boot-starter'
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-data-redis'
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-security'
     exclude group: 'org.springframework.cloud', module: 'spring-cloud-starter-openfeign'
