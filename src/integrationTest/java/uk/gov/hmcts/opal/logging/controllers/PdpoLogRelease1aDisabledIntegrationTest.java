@@ -39,16 +39,16 @@ class PdpoLogRelease1aDisabledIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void returnsMethodNotAllowedWhenRelease1aDisabled() throws Exception {
+    void returnsNotFoundWhenRelease1aDisabled() throws Exception {
         mockMvc
             .perform(post("/log/pdpo").contentType(APPLICATION_JSON_VALUE)
                          .content(objectMapper.writeValueAsBytes(baseRequest())))
-            .andExpect(status().isMethodNotAllowed())
+            .andExpect(status().isNotFound())
             .andExpect(content().contentTypeCompatibleWith("application/problem+json"))
             .andExpect(jsonPath("$.title").value("Feature Disabled"))
             .andExpect(jsonPath("$.detail").value("The requested feature is not currently available"))
             .andExpect(jsonPath("$.type").value("https://hmcts.gov.uk/problems/feature-disabled"))
-            .andExpect(jsonPath("$.status").value(405))
+            .andExpect(jsonPath("$.status").value(404))
             .andExpect(jsonPath("$.retriable").value(false));
 
         assertThat(logRepository.count()).isZero();
