@@ -25,6 +25,12 @@
       "allowedVersions": "<3.0.0"
     },
     {
+      "description": "opal-common-lib updates are coordinated manually across consuming services",
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["uk.gov.hmcts:opal-common-lib"],
+      "enabled": false
+    },
+    {
       "description": "Group Tomcat embed dependencies",
       "matchManagers": ["gradle"],
       "matchPackageNames": [
