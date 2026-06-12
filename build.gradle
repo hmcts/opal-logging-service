@@ -220,7 +220,7 @@ dependencies {
   openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.43"
   openapiImplementation "io.swagger.core.v3:swagger-models:2.2.50"
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.50"
-  openapiImplementation "tools.jackson.dataformat:jackson-dataformat-yaml:3.1.2"
+  openapiImplementation "tools.jackson.dataformat:jackson-dataformat-yaml:3.2.0"
   openapiImplementation "org.mozilla:rhino:1.9.1"
 
   implementation('uk.gov.hmcts:opal-common-lib:0.3.16') {
