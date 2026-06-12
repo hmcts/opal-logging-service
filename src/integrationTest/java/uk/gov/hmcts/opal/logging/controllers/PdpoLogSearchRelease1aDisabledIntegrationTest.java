@@ -19,18 +19,18 @@ import uk.gov.hmcts.opal.logging.testsupport.AbstractIntegrationTest;
 class PdpoLogSearchRelease1aDisabledIntegrationTest extends AbstractIntegrationTest {
 
     @Test
-    void returnsMethodNotAllowedWhenRelease1aDisabled() throws Exception {
+    void returnsNotFoundWhenRelease1aDisabled() throws Exception {
         SearchPdpoLogRequest request = new SearchPdpoLogRequest().businessIdentifier("ACME");
 
         mockMvc
             .perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
                          .content(objectMapper.writeValueAsBytes(request)))
-            .andExpect(status().isMethodNotAllowed())
+            .andExpect(status().isNotFound())
             .andExpect(content().contentTypeCompatibleWith("application/problem+json"))
             .andExpect(jsonPath("$.title").value("Feature Disabled"))
             .andExpect(jsonPath("$.detail").value("The requested feature is not currently available"))
             .andExpect(jsonPath("$.type").value("https://hmcts.gov.uk/problems/feature-disabled"))
-            .andExpect(jsonPath("$.status").value(405))
+            .andExpect(jsonPath("$.status").value(404))
             .andExpect(jsonPath("$.retriable").value(false));
     }
 }

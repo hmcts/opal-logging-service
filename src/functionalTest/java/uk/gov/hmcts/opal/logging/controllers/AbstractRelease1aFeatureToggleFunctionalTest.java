@@ -94,7 +94,7 @@ abstract class AbstractRelease1aFeatureToggleFunctionalTest extends AbstractFunc
      * @param response HTTP response returned by a gated endpoint
      */
     protected void assertFeatureDisabled(TestHttpClient.Response response) {
-        assertThat(response.statusCode()).isEqualTo(405);
+        assertThat(response.statusCode()).isEqualTo(404);
 
         Map<String, Object> problemDetail = parseProblemDetail(response.body());
 
@@ -102,7 +102,7 @@ abstract class AbstractRelease1aFeatureToggleFunctionalTest extends AbstractFunc
             .containsEntry("title", "Feature Disabled")
             .containsEntry("detail", "The requested feature is not currently available")
             .containsEntry("type", "https://hmcts.gov.uk/problems/feature-disabled")
-            .containsEntry("status", 405)
+            .containsEntry("status", 404)
             .containsEntry("retriable", false);
         assertThat(problemDetail).containsKey("operation_id");
         assertThat(problemDetail).containsKey("instance");
