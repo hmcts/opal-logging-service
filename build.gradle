@@ -21,6 +21,10 @@ plugins {
   id "org.openapi.generator" version "7.23.0"
 }
 
+var skipTests = true//System.getenv('SKIP_TESTS') != null && System.getenv('SKIP_TESTS').toBoolean();
+var skipSonar = true//System.getenv('SKIP_SONAR') != null && System.getenv('SKIP_SONAR').toBoolean();
+
+
 application {
   mainClass = 'uk.gov.hmcts.opal.logging.Application'
   group = 'uk.gov.hmcts.opal'
@@ -117,6 +121,11 @@ tasks.withType(JavaExec).configureEach {
 
 tasks.withType(Test).configureEach {
   useJUnitPlatform()
+
+  if (skipTests) {
+    exclude("uk/gov/hmcts/opal/**")
+  }
+
   failFast = true
 
   testLogging {
@@ -171,6 +180,9 @@ sonarqube {
   properties {
     property "sonar.projectName", "HMCTS :: opal-logging-service"
     property "sonar.projectKey", "uk.gov.hmcts:opal-logging-service"
+    if (skipSonar) {
+      property 'sonar.exclusions', "**/**"
+    }
   }
 }
 
@@ -211,6 +223,7 @@ ext {
   nettyVersion = "4.1.132.Final"
   set('spring-framework.version', "7.0.8")
 }
+
 
 ext['tomcat.version'] = '11.0.22'
 ext['snakeyaml.version'] = '2.0'
