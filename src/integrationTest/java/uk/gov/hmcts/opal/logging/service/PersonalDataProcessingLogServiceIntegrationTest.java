@@ -52,16 +52,25 @@ class PersonalDataProcessingLogServiceIntegrationTest extends AbstractIntegratio
         AddPdpoLogRequest request = baseRequest()
             .category(CategoryEnum.DISCLOSURE)
             .recipient(recipient)
-            .individuals(List.of(
-                participant("person-1", "DEFENDANT"),
-                participant("person-2", "MINOR_CREDITOR")
-            ));
+            .individuals(List.of(participant("person-1", "DEFENDANT"), participant("person-2", "MINOR_CREDITOR")));
 
         PdpoLogEntity persisted = service.recordLog(request);
         PdpoLogEntity fromDb = logRepository.findById(persisted.getId()).orElseThrow();
 
         assertThat(fromDb.getRecipientIdentifier()).isEqualTo("recipient-42");
         assertThat(fromDb.getIndividuals()).hasSize(2);
+    }
+
+    @Test
+    @Transactional
+    void stripsPortBeforePersistingIpAddress() {
+        AddPdpoLogRequest request = baseRequest()
+            .ipAddress("10.147.96.22:46914");
+
+        PdpoLogEntity persisted = service.recordLog(request);
+        PdpoLogEntity fromDb = logRepository.findById(persisted.getId()).orElseThrow();
+
+        assertThat(fromDb.getIpAddress()).isEqualTo("10.147.96.22");
     }
 
     private AddPdpoLogRequest baseRequest() {

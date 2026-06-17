@@ -53,7 +53,7 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
             .createdByIdentifier(normalized(details.getCreatedBy().getId()))
             .createdByIdentifierType(resolveType(details.getCreatedBy()))
             .createdAt(details.getCreatedAt())
-            .ipAddress(normalized(details.getIpAddress()))
+            .ipAddress(normalizeIpAddress(details.getIpAddress()))
             .category(category)
             .businessIdentifier(identifier)
             .build();
@@ -108,6 +108,30 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
 
     private static String normalized(String value) {
         return value == null ? null : value.trim();
+    }
+
+    private static String normalizeIpAddress(String value) {
+        String trimmed = normalized(value);
+        if (trimmed == null) {
+            return null;
+        }
+
+        if (trimmed.startsWith("[")) {
+            int closingBracket = trimmed.indexOf(']');
+            if (closingBracket > 1) {
+                return trimmed.substring(1, closingBracket);
+            }
+        }
+
+        int separator = trimmed.lastIndexOf(':');
+        if (separator > 0
+            && separator == trimmed.indexOf(':')
+            && separator < trimmed.length() - 1
+            && trimmed.substring(separator + 1).chars().allMatch(Character::isDigit)) {
+            return trimmed.substring(0, separator);
+        }
+
+        return trimmed;
     }
 
     private static String normalizedOrNull(String value) {
