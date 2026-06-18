@@ -85,9 +85,8 @@ class PersonalDataProcessingLogServiceImplTest {
 
     @Test
     void record_persistsAllIndividuals() {
-        when(identifierRepository.findByBusinessIdentifier("ACME")).thenReturn(Optional.of(
-            PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()
-        ));
+        when(identifierRepository.findByBusinessIdentifier("ACME"))
+            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
 
         ParticipantIdentifier first = identifier("ind-1", "DEFENDANT");
         ParticipantIdentifier second = identifier("ind-2", "MINOR_CREDITOR");
@@ -98,6 +97,50 @@ class PersonalDataProcessingLogServiceImplTest {
 
         verify(logRepository).save(logCaptor.capture());
         assertThat(logCaptor.getValue().getIndividuals()).hasSize(2);
+    }
+
+    @Test
+    void record_stripsPortFromIpv4Address() {
+        when(identifierRepository.findByBusinessIdentifier("ACME"))
+            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
+
+        service.recordLog(minimalDetails().ipAddress("10.147.96.22:46914"));
+
+        verify(logRepository).save(logCaptor.capture());
+        assertThat(logCaptor.getValue().getIpAddress()).isEqualTo("10.147.96.22");
+    }
+
+    @Test
+    void record_unwrapsBracketedIpv6Address() {
+        when(identifierRepository.findByBusinessIdentifier("ACME"))
+            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
+
+        service.recordLog(minimalDetails().ipAddress("[2001:db8::1]:443"));
+
+        verify(logRepository).save(logCaptor.capture());
+        assertThat(logCaptor.getValue().getIpAddress()).isEqualTo("2001:db8::1");
+    }
+
+    @Test
+    void record_keepsPlainIpv6AddressUnchanged() {
+        when(identifierRepository.findByBusinessIdentifier("ACME"))
+            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
+
+        service.recordLog(minimalDetails().ipAddress("2001:db8::1"));
+
+        verify(logRepository).save(logCaptor.capture());
+        assertThat(logCaptor.getValue().getIpAddress()).isEqualTo("2001:db8::1");
+    }
+
+    @Test
+    void record_keepsNullIpAddressUnchanged() {
+        when(identifierRepository.findByBusinessIdentifier("ACME"))
+            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
+
+        service.recordLog(minimalDetails().ipAddress(null));
+
+        verify(logRepository).save(logCaptor.capture());
+        assertThat(logCaptor.getValue().getIpAddress()).isNull();
     }
 
     @Test
@@ -141,17 +184,14 @@ class PersonalDataProcessingLogServiceImplTest {
             any(Sort.class)
         )).thenReturn(List.of(entity));
 
-        List<PdpoLogEntity> results = service.searchLogs(
-            new SearchPdpoLogRequest()
-                .createdBy(new ParticipantIdentifier().id("user-1").type("OPAL_USER_ID"))
-                .businessIdentifier("ACME")
-        );
+        List<PdpoLogEntity> results = service.searchLogs(new SearchPdpoLogRequest()
+            .createdBy(new ParticipantIdentifier().id("user-1").type("OPAL_USER_ID"))
+            .businessIdentifier("ACME"));
 
         assertThat(results).containsExactly(entity);
         verify(logRepository).findAll(
             org.mockito.ArgumentMatchers.<org.springframework.data.jpa.domain.Specification<PdpoLogEntity>>any(),
-            any(Sort.class)
-        );
+            any(Sort.class));
     }
 
     private AddPdpoLogRequest minimalDetails() {
