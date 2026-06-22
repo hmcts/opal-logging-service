@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -21,6 +20,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest.CategoryEnum;
@@ -28,7 +28,6 @@ import uk.gov.hmcts.opal.logging.generated.dto.ParticipantIdentifier;
 import uk.gov.hmcts.opal.logging.generated.dto.SearchPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoIdentifierEntity;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogEntity;
-import uk.gov.hmcts.opal.logging.persistence.repository.PdpoIdentifierRepository;
 import uk.gov.hmcts.opal.logging.persistence.repository.PdpoLogRepository;
 import uk.gov.hmcts.opal.logging.persistence.specification.PdpoLogSpecifications;
 
@@ -36,7 +35,7 @@ import uk.gov.hmcts.opal.logging.persistence.specification.PdpoLogSpecifications
 class PersonalDataProcessingLogServiceImplTest {
 
     @Mock
-    private PdpoIdentifierRepository identifierRepository;
+    private PdpoIdentifierService identifierService;
     @Mock
     private PdpoLogRepository logRepository;
     @Captor
@@ -48,7 +47,7 @@ class PersonalDataProcessingLogServiceImplTest {
     @BeforeEach
     void setUp() {
         logSpecifications = new PdpoLogSpecifications();
-        service = new PersonalDataProcessingLogServiceImpl(identifierRepository, logRepository, logSpecifications);
+        service = new PersonalDataProcessingLogServiceImpl(identifierService, logRepository, logSpecifications);
         lenient().when(logRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
@@ -58,35 +57,35 @@ class PersonalDataProcessingLogServiceImplTest {
             .id(42L)
             .businessIdentifier("ACME")
             .build();
-        when(identifierRepository.findByBusinessIdentifier("ACME")).thenReturn(Optional.of(existing));
+        when(identifierService.findOrCreate("ACME")).thenReturn(existing);
 
         service.recordLog(minimalDetails().businessIdentifier("ACME"));
 
-        verify(identifierRepository, never()).save(any());
+        verify(identifierService).findOrCreate("ACME");
         verify(logRepository).save(logCaptor.capture());
         assertThat(logCaptor.getValue().getBusinessIdentifier()).isEqualTo(existing);
     }
 
     @Test
     void record_createsNewBusinessIdentifierWhenMissing() {
-        when(identifierRepository.findByBusinessIdentifier("NEW-CO")).thenReturn(Optional.empty());
-        when(identifierRepository.save(any())).thenAnswer(invocation -> {
-            PdpoIdentifierEntity entity = invocation.getArgument(0);
-            entity.setId(7L);
-            return entity;
-        });
+        PdpoIdentifierEntity created = PdpoIdentifierEntity.builder()
+            .id(7L)
+            .businessIdentifier("NEW-CO")
+            .build();
+        when(identifierService.findOrCreate("NEW-CO")).thenReturn(created);
 
         service.recordLog(minimalDetails().businessIdentifier("NEW-CO"));
 
-        verify(identifierRepository).save(any());
+        verify(identifierService).findOrCreate("NEW-CO");
         verify(logRepository).save(logCaptor.capture());
         assertThat(logCaptor.getValue().getBusinessIdentifier().getBusinessIdentifier()).isEqualTo("NEW-CO");
     }
 
     @Test
     void record_persistsAllIndividuals() {
-        when(identifierRepository.findByBusinessIdentifier("ACME"))
-            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
+        when(identifierService.findOrCreate("ACME")).thenReturn(
+            PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()
+        );
 
         ParticipantIdentifier first = identifier("ind-1", "DEFENDANT");
         ParticipantIdentifier second = identifier("ind-2", "MINOR_CREDITOR");
@@ -100,9 +99,27 @@ class PersonalDataProcessingLogServiceImplTest {
     }
 
     @Test
+    void record_reloadsIdentifierAfterUniqueConstraintViolation() {
+        when(identifierService.findOrCreate("ACME"))
+            .thenThrow(new DataIntegrityViolationException("duplicate key"));
+        PdpoIdentifierEntity existing = PdpoIdentifierEntity.builder()
+            .id(42L)
+            .businessIdentifier("ACME")
+            .build();
+        when(identifierService.findByBusinessIdentifier("ACME")).thenReturn(Optional.of(existing));
+
+        service.recordLog(minimalDetails().businessIdentifier("ACME"));
+
+        verify(identifierService).findOrCreate("ACME");
+        verify(identifierService).findByBusinessIdentifier("ACME");
+        verify(logRepository).save(logCaptor.capture());
+        assertThat(logCaptor.getValue().getBusinessIdentifier()).isEqualTo(existing);
+    }
+
+    @Test
     void record_stripsPortFromIpv4Address() {
-        when(identifierRepository.findByBusinessIdentifier("ACME"))
-            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
+        when(identifierService.findOrCreate("ACME"))
+            .thenReturn(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build());
 
         service.recordLog(minimalDetails().ipAddress("10.147.96.22:46914"));
 
@@ -112,8 +129,8 @@ class PersonalDataProcessingLogServiceImplTest {
 
     @Test
     void record_unwrapsBracketedIpv6Address() {
-        when(identifierRepository.findByBusinessIdentifier("ACME"))
-            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
+        when(identifierService.findOrCreate("ACME"))
+            .thenReturn(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build());
 
         service.recordLog(minimalDetails().ipAddress("[2001:db8::1]:443"));
 
@@ -123,8 +140,8 @@ class PersonalDataProcessingLogServiceImplTest {
 
     @Test
     void record_keepsPlainIpv6AddressUnchanged() {
-        when(identifierRepository.findByBusinessIdentifier("ACME"))
-            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
+        when(identifierService.findOrCreate("ACME"))
+            .thenReturn(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build());
 
         service.recordLog(minimalDetails().ipAddress("2001:db8::1"));
 
@@ -134,8 +151,8 @@ class PersonalDataProcessingLogServiceImplTest {
 
     @Test
     void record_keepsNullIpAddressUnchanged() {
-        when(identifierRepository.findByBusinessIdentifier("ACME"))
-            .thenReturn(Optional.of(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()));
+        when(identifierService.findOrCreate("ACME"))
+            .thenReturn(PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build());
 
         service.recordLog(minimalDetails().ipAddress(null));
 
