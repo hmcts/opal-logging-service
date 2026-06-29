@@ -26,7 +26,7 @@ opal:
       consumer:
         enabled: ${LOGGING_PDPL_CONSUMER_ENABLED:true}
         connection-string: ${SERVICEBUS_CONNECTION_STRING:Endpoint=sb://localhost/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=local;UseDevelopmentEmulator=true}
-        queue-name: ${SERVICEBUS_LOGGING_PDPL_QUEUE_NAME:logging-pdpl}
+        queue-name: FAILING # ${SERVICEBUS_LOGGING_PDPL_QUEUE_NAME:logging-pdpl}
         protocol: ${SERVICEBUS_LOGGING_PDPL_PROTOCOL:amqp}
         idle-timeout-ms: ${SERVICEBUS_IDLE_TIMEOUT_MS:30000}
 
