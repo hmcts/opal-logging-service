@@ -24,11 +24,12 @@ class PdpoQueueConsumerImplTest {
         .findAndAddModules()
         .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
         .build();
+    private final PdpoQueueMessageMapper queueMessageMapper = new PdpoQueueMessageMapper();
 
     @Test
     void consumeParsesMessageAndPersistsLog() throws Exception {
         PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
-        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, logService);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, queueMessageMapper, logService);
 
         AddPdpoLogRequest details = new AddPdpoLogRequest()
             .createdBy(new ParticipantIdentifier().id("user-1").type("OPAL_USER_ID"))
@@ -38,7 +39,7 @@ class PdpoQueueConsumerImplTest {
             .category(CategoryEnum.COLLECTION)
             .individuals(List.of(new ParticipantIdentifier().id("ind-1").type("DEFENDANT")));
 
-        String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("PDPO", details));
+        String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("PDPO", queueDetails(details)));
 
         consumer.consume(payload);
 
@@ -51,7 +52,7 @@ class PdpoQueueConsumerImplTest {
     @Test
     void consumeRejectsUnsupportedLogType() throws Exception {
         PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
-        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, logService);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, queueMessageMapper, logService);
 
         AddPdpoLogRequest details = new AddPdpoLogRequest()
             .createdBy(new ParticipantIdentifier().id("user-1").type("OPAL_USER_ID"))
@@ -61,7 +62,7 @@ class PdpoQueueConsumerImplTest {
             .category(CategoryEnum.COLLECTION)
             .individuals(List.of(new ParticipantIdentifier().id("ind-1").type("DEFENDANT")));
 
-        String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("OTHER", details));
+        String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("OTHER", queueDetails(details)));
 
         assertThatThrownBy(() -> consumer.consume(payload))
             .isInstanceOf(IllegalArgumentException.class)
@@ -73,7 +74,7 @@ class PdpoQueueConsumerImplTest {
     @Test
     void consumeRejectsBlankPayload() {
         PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
-        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, logService);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, queueMessageMapper, logService);
 
         assertThatThrownBy(() -> consumer.consume("   "))
             .isInstanceOf(IllegalArgumentException.class)
@@ -85,7 +86,7 @@ class PdpoQueueConsumerImplTest {
     @Test
     void consumeRejectsInvalidJson() {
         PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
-        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, logService);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, queueMessageMapper, logService);
 
         assertThatThrownBy(() -> consumer.consume("{invalid"))
             .isInstanceOf(IllegalArgumentException.class)
@@ -97,7 +98,7 @@ class PdpoQueueConsumerImplTest {
     @Test
     void consumeRejectsMissingDetails() throws Exception {
         PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
-        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, logService);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, queueMessageMapper, logService);
 
         String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("PDPO", null));
 
@@ -106,5 +107,86 @@ class PdpoQueueConsumerImplTest {
             .hasMessageContaining("missing details");
 
         verify(logService, never()).recordLog(Mockito.any());
+    }
+
+    @Test
+    void consumeParsesCompactIndividualsAndPersistsLog() {
+        PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, queueMessageMapper, logService);
+
+        String payload = """
+            {
+              "log_type": "PDPO",
+              "details": {
+                "created_by": {
+                  "id": "user-1",
+                  "type": "OPAL_USER_ID"
+                },
+                "created_at": "2025-11-09T10:15:30Z",
+                "business_identifier": "ACME",
+                "ip_address": "10.0.0.1",
+                "category": "Collection",
+                "individuals": {
+                  "DEFENDANT": ["ind-1", "ind-2"],
+                  "MINOR_CREDITOR": ["ind-3"]
+                }
+              }
+            }
+            """;
+
+        consumer.consume(payload);
+
+        ArgumentCaptor<AddPdpoLogRequest> captor = ArgumentCaptor.forClass(AddPdpoLogRequest.class);
+        verify(logService).recordLog(captor.capture());
+        AddPdpoLogRequest captured = captor.getValue();
+        assertThat(captured.getIndividuals()).containsExactly(
+            new ParticipantIdentifier().id("ind-1").type("DEFENDANT"),
+            new ParticipantIdentifier().id("ind-2").type("DEFENDANT"),
+            new ParticipantIdentifier().id("ind-3").type("MINOR_CREDITOR")
+        );
+        assertThat(captured.getBusinessIdentifier()).isEqualTo("ACME");
+    }
+
+    @Test
+    void consumeRejectsInvalidCompactIndividuals() {
+        PersonalDataProcessingLogService logService = Mockito.mock(PersonalDataProcessingLogService.class);
+        PdpoQueueConsumerImpl consumer = new PdpoQueueConsumerImpl(objectMapper, queueMessageMapper, logService);
+
+        String payload = """
+            {
+              "log_type": "PDPO",
+              "details": {
+                "created_by": {
+                  "id": "user-1",
+                  "type": "OPAL_USER_ID"
+                },
+                "created_at": "2025-11-09T10:15:30Z",
+                "business_identifier": "ACME",
+                "ip_address": "10.0.0.1",
+                "category": "Collection",
+                "individuals": {
+                  "DEFENDANT": "ind-1"
+                }
+              }
+            }
+            """;
+
+        assertThatThrownBy(() -> consumer.consume(payload))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Unable to parse");
+
+        verify(logService, never()).recordLog(Mockito.any());
+    }
+
+    private PdpoQueueDetails queueDetails(AddPdpoLogRequest details) {
+        PdpoQueueDetails queueDetails = new PdpoQueueDetails();
+        queueDetails.setCreatedBy(details.getCreatedBy());
+        queueDetails.setCreatedAt(details.getCreatedAt());
+        queueDetails.setBusinessIdentifier(details.getBusinessIdentifier());
+        queueDetails.setIpAddress(details.getIpAddress());
+        queueDetails.setCategory(details.getCategory());
+        queueDetails.setRecipient(details.getRecipient());
+        queueDetails.setIndividuals(objectMapper.valueToTree(details.getIndividuals()));
+        return queueDetails;
     }
 }
