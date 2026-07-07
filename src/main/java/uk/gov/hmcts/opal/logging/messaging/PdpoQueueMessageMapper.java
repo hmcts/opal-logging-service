@@ -1,26 +1,22 @@
 package uk.gov.hmcts.opal.logging.messaging;
 
 import java.util.List;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
 import tools.jackson.databind.JsonNode;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.generated.dto.ParticipantIdentifier;
 
-@Component
-public class PdpoQueueMessageMapper {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
+public interface PdpoQueueMessageMapper {
 
-    public AddPdpoLogRequest toAddPdpoLogRequest(PdpoQueueDetails queueDetails) {
-        return new AddPdpoLogRequest()
-            .createdBy(queueDetails.getCreatedBy())
-            .businessIdentifier(queueDetails.getBusinessIdentifier())
-            .createdAt(queueDetails.getCreatedAt())
-            .ipAddress(queueDetails.getIpAddress())
-            .category(queueDetails.getCategory())
-            .recipient(queueDetails.getRecipient())
-            .individuals(parseIndividuals(queueDetails.getIndividuals()));
-    }
+    @Mapping(target = "individuals", source = "individuals", qualifiedByName = "individuals")
+    AddPdpoLogRequest toAddPdpoLogRequest(PdpoQueueDetails queueDetails);
 
-    public List<ParticipantIdentifier> parseIndividuals(JsonNode individualsNode) {
+    @Named("individuals")
+    default List<ParticipantIdentifier> parseIndividuals(JsonNode individualsNode) {
         if (individualsNode == null || individualsNode.isNull()) {
             return null;
         }

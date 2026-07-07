@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import tools.jackson.databind.ObjectMapper;
@@ -24,7 +25,7 @@ class PdpoQueueConsumerImplTest {
         .findAndAddModules()
         .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
         .build();
-    private final PdpoQueueMessageMapper queueMessageMapper = new PdpoQueueMessageMapper();
+    private final PdpoQueueMessageMapper queueMessageMapper = Mappers.getMapper(PdpoQueueMessageMapper.class);
 
     @Test
     void consumeParsesMessageAndPersistsLog() throws Exception {
