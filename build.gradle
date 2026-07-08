@@ -212,7 +212,9 @@ ext {
   set('spring-framework.version', "7.0.8")
 }
 
-ext['tomcat.version'] = '11.0.22'
+// Tomcat 11.0.23 fixes CVE-2026-53404, CVE-2026-55956, CVE-2026-55955,
+// CVE-2026-50229, CVE-2026-55276, and CVE-2026-53434.
+ext['tomcat.version'] = '11.0.23'
 ext['snakeyaml.version'] = '2.0'
 ext['postgresql.version'] = '42.7.11'
 
