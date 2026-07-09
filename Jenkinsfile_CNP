@@ -2,7 +2,14 @@
 // If this is new microservice built on the template and you want it to run in Jenkins, you
 // will need to follow these steps: https://hmcts.github.io/cloud-native-platform/new-component/github-repo.html
 
-@Library("Infrastructure@2.0.0")
+properties([
+  parameters([
+    booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip all tests'),
+    booleanParam(name: 'SKIP_SONAR', defaultValue: false, description: 'Skip sonar'),
+  ])
+])
+
+@Library("Infrastructure")
 
 def type = "java"
 def product = "opal"
