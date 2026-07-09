@@ -39,6 +39,14 @@
     ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/applicationinsights\-(core|web)@.*$</packageUrl>
     <cve>CVE-2025-21199</cve>
+  </suppress>
+  <suppress until="2026-07-31Z">
+    <notes><![CDATA[
+    Temporary test-branch suppression added 2026-07-09.
+    This service still resolves org.apache.tomcat.embed artifacts to 11.0.22 on this branch.
+    Use this only while testing on the branch and remove it once Tomcat is upgraded.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-(core|el|websocket)@11\.0\.22$</packageUrl>
     <cve>CVE-2026-53404</cve>
     <cve>CVE-2026-55956</cve>
     <cve>CVE-2026-55955</cve>
