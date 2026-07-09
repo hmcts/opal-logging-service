@@ -188,7 +188,7 @@ dependencyUpdates {
 
 dependencyManagement {
   imports {
-    mavenBom "io.netty:netty-bom:4.2.15.Final"
+    mavenBom "io.netty:netty-bom:4.2.16.Final"
   }
 }
 
