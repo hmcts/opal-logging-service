@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,6 @@ import uk.gov.hmcts.opal.logging.generated.dto.SearchPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoIdentifierEntity;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogEntity;
 import uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogIndividualEntity;
-import uk.gov.hmcts.opal.logging.persistence.repository.PdpoIdentifierRepository;
 import uk.gov.hmcts.opal.logging.persistence.repository.PdpoLogRepository;
 import uk.gov.hmcts.opal.logging.persistence.specification.PdpoLogSearchCriteria;
 import uk.gov.hmcts.opal.logging.persistence.specification.PdpoLogSpecifications;
@@ -25,15 +25,15 @@ import uk.gov.hmcts.opal.logging.persistence.specification.PdpoLogSpecifications
 @Transactional
 public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcessingLogService {
 
-    private final PdpoIdentifierRepository identifierRepository;
+    private final PdpoIdentifierService identifierService;
     private final PdpoLogRepository logRepository;
     private final PdpoLogSpecifications logSpecifications;
 
     public PersonalDataProcessingLogServiceImpl(
-        PdpoIdentifierRepository identifierRepository, PdpoLogRepository logRepository,
+        PdpoIdentifierService identifierService, PdpoLogRepository logRepository,
         PdpoLogSpecifications logSpecifications) {
 
-        this.identifierRepository = identifierRepository;
+        this.identifierService = identifierService;
         this.logRepository = logRepository;
         this.logSpecifications = logSpecifications;
     }
@@ -41,11 +41,13 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
     @Override
     public PdpoLogEntity recordLog(AddPdpoLogRequest details) {
         String businessIdentifierValue = normalized(details.getBusinessIdentifier());
-        PdpoIdentifierEntity identifier = identifierRepository.findByBusinessIdentifier(businessIdentifierValue)
-            .orElseGet(() -> identifierRepository.save(
-                PdpoIdentifierEntity.builder()
-                    .businessIdentifier(businessIdentifierValue)
-                    .build()));
+        PdpoIdentifierEntity identifier;
+        try {
+            identifier = identifierService.findOrCreate(businessIdentifierValue);
+        } catch (DataIntegrityViolationException ex) {
+            identifier = identifierService.findByBusinessIdentifier(businessIdentifierValue)
+                .orElseThrow(() -> ex);
+        }
 
         PdpoCategory category = resolveCategory(details);
 
@@ -53,7 +55,7 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
             .createdByIdentifier(normalized(details.getCreatedBy().getId()))
             .createdByIdentifierType(resolveType(details.getCreatedBy()))
             .createdAt(details.getCreatedAt())
-            .ipAddress(normalized(details.getIpAddress()))
+            .ipAddress(normalizeIpAddress(details.getIpAddress()))
             .category(category)
             .businessIdentifier(identifier)
             .build();
@@ -108,6 +110,30 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
 
     private static String normalized(String value) {
         return value == null ? null : value.trim();
+    }
+
+    private static String normalizeIpAddress(String value) {
+        String trimmed = normalized(value);
+        if (trimmed == null) {
+            return null;
+        }
+
+        if (trimmed.startsWith("[")) {
+            int closingBracket = trimmed.indexOf(']');
+            if (closingBracket > 1) {
+                return trimmed.substring(1, closingBracket);
+            }
+        }
+
+        int separator = trimmed.lastIndexOf(':');
+        if (separator > 0
+            && separator == trimmed.indexOf(':')
+            && separator < trimmed.length() - 1
+            && trimmed.substring(separator + 1).chars().allMatch(Character::isDigit)) {
+            return trimmed.substring(0, separator);
+        }
+
+        return trimmed;
     }
 
     private static String normalizedOrNull(String value) {

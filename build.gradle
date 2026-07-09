@@ -2,7 +2,7 @@ import org.gradle.api.plugins.quality.Checkstyle
 
 buildscript {
   dependencies {
-    classpath("org.flywaydb:flyway-database-postgresql:12.8.1")
+    classpath("org.flywaydb:flyway-database-postgresql:12.10.0")
   }
 }
 plugins {
@@ -12,7 +12,7 @@ plugins {
   id 'org.springframework.boot' version '4.1.0'
   id 'com.github.ben-manes.versions' version '0.54.0'
   id 'org.sonarqube' version '7.3.1.8318'
-  id 'org.flywaydb.flyway' version '12.8.1'
+  id 'org.flywaydb.flyway' version '12.10.0'
   /*
     Applies analysis tools including checkstyle and OWASP Dependency checker.
     See https://github.com/hmcts/gradle-java-plugin
@@ -200,7 +200,7 @@ dependencyUpdates {
 
 dependencyManagement {
   imports {
-    mavenBom "io.netty:netty-bom:4.2.15.Final"
+    mavenBom "io.netty:netty-bom:4.2.16.Final"
   }
 }
 
@@ -218,8 +218,8 @@ repositories {
 }
 
 ext {
-  log4JVersion = "2.26.0"
-  logbackVersion = "1.5.34"
+  log4JVersion = "2.26.1"
+  logbackVersion = "1.5.37"
   nettyVersion = "4.1.132.Final"
   set('spring-framework.version', "7.0.8")
 }
@@ -230,9 +230,9 @@ ext['snakeyaml.version'] = '2.0'
 ext['postgresql.version'] = '42.7.11'
 
 dependencies {
-  openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.44"
-  openapiImplementation "io.swagger.core.v3:swagger-models:2.2.51"
-  openapiImplementation "io.swagger.core.v3:swagger-core:2.2.51"
+  openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.45"
+  openapiImplementation "io.swagger.core.v3:swagger-models:2.2.52"
+  openapiImplementation "io.swagger.core.v3:swagger-core:2.2.52"
   openapiImplementation "tools.jackson.dataformat:jackson-dataformat-yaml:3.2.0"
   openapiImplementation "org.mozilla:rhino:1.9.1"
 
@@ -266,8 +266,8 @@ dependencies {
     exclude group: 'com.microsoft.azure', module: 'applicationinsights-spring-boot-starter'
   }
   implementation 'org.springframework.boot:spring-boot-flyway'
-  implementation 'org.flywaydb:flyway-core:12.8.1'
-  runtimeOnly 'org.flywaydb:flyway-database-postgresql:12.8.1', {
+  implementation 'org.flywaydb:flyway-core:12.10.0'
+  runtimeOnly 'org.flywaydb:flyway-database-postgresql:12.10.0', {
     exclude group: 'org.flywaydb', module: 'flyway-core'
   }
   implementation 'org.postgresql:postgresql'
