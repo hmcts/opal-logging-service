@@ -18,7 +18,7 @@ public abstract class EntitySpecs<E> {
             .toList();
     }
 
-    protected Optional<String> notBlank(String candidate) {
+    protected static Optional<String> notBlank(String candidate) {
         if (candidate == null) {
             return Optional.empty();
         }
