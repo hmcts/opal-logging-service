@@ -16,6 +16,7 @@ public class PdpoQueueConsumerImpl implements PdpoQueueConsumer {
     static final String PDPO_LOG_TYPE = "PDPO";
 
     private final ObjectMapper objectMapper;
+    private final PdpoQueueMessageMapper queueMessageMapper;
     private final PersonalDataProcessingLogService logService;
 
     @Override
@@ -25,10 +26,7 @@ public class PdpoQueueConsumerImpl implements PdpoQueueConsumer {
         if (!PDPO_LOG_TYPE.equals(logType)) {
             throw new IllegalArgumentException("Unsupported log type: " + logType);
         }
-        AddPdpoLogRequest details = message.details();
-        if (details == null) {
-            throw new IllegalArgumentException("PDPO message payload missing details");
-        }
+        AddPdpoLogRequest details = parseDetails(message.details());
         logService.recordLog(details);
         log.info("PDPL queue message processed businessIdentifier={} category={}",
             details.getBusinessIdentifier(),
@@ -44,6 +42,17 @@ public class PdpoQueueConsumerImpl implements PdpoQueueConsumer {
         } catch (JacksonException ex) {
             log.error("PDPL queue message parse failed", ex);
             throw new IllegalArgumentException("Unable to parse PDPO message payload", ex);
+        }
+    }
+
+    private AddPdpoLogRequest parseDetails(PdpoQueueDetails queueDetails) {
+        if (queueDetails == null) {
+            throw new IllegalArgumentException("PDPO message payload missing details");
+        }
+        try {
+            return queueMessageMapper.toAddPdpoLogRequest(queueDetails);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Unable to parse PDPO message payload", e);
         }
     }
 }
