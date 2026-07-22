@@ -1,7 +1,7 @@
 openapi: 3.1.1
 info:
   title: Opal Logging Service - Personal Data Processing APIs
-  version: "1.0.0"
+  version: "2.0.0"
 
 paths:
   /log/pdpo:
@@ -251,11 +251,16 @@ components:
           type: string
           minLength: 1
           maxLength: 250
-        individual_id:
+        individual_identifier:
           type: string
           minLength: 1
           maxLength: 50
           description: Unique identifier for the individual user/entity.
+        individual_type:
+          type: string
+          minLength: 1
+          maxLength: 30
+          description: Type of identifier. Examples - OPAL_USER_ID, EXTERNAL_SERVICE, DEFENDANT, MINOR_CREDITOR.
         category:
           type: string
           enum:
@@ -265,7 +270,9 @@ components:
             - Disclosure
             - Combination
             - Erasure
-
+        created_after:
+          type: string
+          format: date
 tags:
   - name: PersonalDataProcessingLog
     description: Endpoints related to personal data processing logging endpoints.

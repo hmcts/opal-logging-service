@@ -66,6 +66,8 @@ class PdpoLogSpecificationsTest {
             "OPAL_USER_ID",
             null,
             null,
+            null,
+            null,
             null
         );
 
@@ -89,7 +91,9 @@ class PdpoLogSpecificationsTest {
             null,
             "ACC-1",
             null,
-            PdpoCategory.DISCLOSURE
+            null,
+            PdpoCategory.DISCLOSURE,
+            null
         );
 
         List<PdpoLogEntity> results = logRepository.findAll(
@@ -100,6 +104,31 @@ class PdpoLogSpecificationsTest {
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().getBusinessIdentifier().getBusinessIdentifier()).isEqualTo("ACC-1");
         assertThat(results.getFirst().getCategory()).isEqualTo(PdpoCategory.DISCLOSURE);
+    }
+
+    @Test
+    void findBySearchCriteriaFiltersByIndividualIdentifierAndType() {
+        persistIndividualLog("user-1", "OPAL_USER_ID", "person-1", "DEFENDANT");
+        persistIndividualLog("user-2", "OPAL_USER_ID", "person-1", "MINOR_CREDITOR");
+        persistIndividualLog("user-3", "OPAL_USER_ID", "person-2", "DEFENDANT");
+
+        PdpoLogSearchCriteria criteria = new PdpoLogSearchCriteria(
+            null,
+            null,
+            null,
+            "person-1",
+            "DEFENDANT",
+            null,
+            null
+        );
+
+        List<PdpoLogEntity> results = logRepository.findAll(
+            specifications.findBySearchCriteria(criteria),
+            Sort.by("id")
+        );
+
+        assertThat(results).hasSize(1);
+        assertThat(results.getFirst().getCreatedByIdentifier()).isEqualTo("user-1");
     }
 
     private void persistLog(String createdBy,
@@ -121,6 +150,34 @@ class PdpoLogSpecificationsTest {
             .createdAt(OffsetDateTime.parse("2024-05-01T10:00:00Z"))
             .ipAddress("127.0.0.1")
             .build();
+
+        logRepository.save(entity);
+    }
+
+    private void persistIndividualLog(String createdBy,
+                                      String createdByType,
+                                      String individualIdentifier,
+                                      String individualType) {
+        PdpoIdentifierEntity identifier = identifierRepository.findByBusinessIdentifier("ACC-1")
+            .orElseGet(() -> identifierRepository.save(
+                PdpoIdentifierEntity.builder()
+                    .businessIdentifier("ACC-1")
+                    .build()
+            ));
+
+        PdpoLogEntity entity = PdpoLogEntity.builder()
+            .createdByIdentifier(createdBy)
+            .createdByIdentifierType(createdByType)
+            .businessIdentifier(identifier)
+            .category(PdpoCategory.DISCLOSURE)
+            .createdAt(OffsetDateTime.parse("2024-05-01T10:00:00Z"))
+            .ipAddress("127.0.0.1")
+            .build();
+
+        entity.addIndividual(uk.gov.hmcts.opal.logging.persistence.entity.PdpoLogIndividualEntity.builder()
+            .individualIdentifier(individualIdentifier)
+            .individualType(individualType)
+            .build());
 
         logRepository.save(entity);
     }

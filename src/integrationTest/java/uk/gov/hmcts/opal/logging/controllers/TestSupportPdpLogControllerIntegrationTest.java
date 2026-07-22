@@ -90,7 +90,7 @@ class TestSupportPdpLogControllerIntegrationTest extends AbstractIntegrationTest
     }
 
     @Test
-    void searchByIndividualIdReturnsSortedLogs() throws Exception {
+    void searchByIndividualIdAndTypeReturnsSortedLogs() throws Exception {
         persistLog("requestor-2", "EXTERNAL_SERVICE", "SHARING",
                    PdpoCategory.COLLECTION, null, null,
                    OffsetDateTime.parse("2025-11-15T10:00:00Z"), "subject-1");
@@ -102,7 +102,8 @@ class TestSupportPdpLogControllerIntegrationTest extends AbstractIntegrationTest
                    OffsetDateTime.parse("2025-11-15T12:00:00Z"), "subject-2");
 
         SearchPdpoLogRequest request = new SearchPdpoLogRequest()
-            .individualId("subject-1");
+            .individualIdentifier("subject-1")
+            .individualType("DEFENDANT");
 
         MvcResult result = mockMvc
             .perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
@@ -196,5 +197,29 @@ class TestSupportPdpLogControllerIntegrationTest extends AbstractIntegrationTest
             .build());
 
         logRepository.save(log);
+    }
+
+    @Test
+    void searchByCreatedAfterReturnsMatchingLogs() throws Exception {
+        persistLog("requestor-1", "OPAL_USER_ID", "SHARING",
+            PdpoCategory.COLLECTION, null, null,
+            OffsetDateTime.parse("2025-11-14T23:59:59Z"), "subject-1");
+        persistLog("requestor-2", "OPAL_USER_ID", "SHARING",
+            PdpoCategory.COLLECTION, null, null,
+            OffsetDateTime.parse("2025-11-15T00:00:01Z"), "subject-2");
+
+        SearchPdpoLogRequest request = new SearchPdpoLogRequest()
+            .createdAfter(java.time.LocalDate.parse("2025-11-15"));
+
+        MvcResult result = mockMvc
+            .perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsBytes(request)))
+            .andExpect(status().isOk()).andReturn();
+
+        List<AddPdpoLogResponse> logs = objectMapper.readValue(
+            result.getResponse().getContentAsByteArray(), new TypeReference<>() {});
+
+        assertThat(logs).hasSize(1);
+        assertThat(logs.getFirst().getCreatedBy().getId()).isEqualTo("requestor-2");
     }
 }
