@@ -8,4 +8,8 @@ def type = "java"
 def product = "opal"
 def component = "logging-service"
 
-withPipeline(type, product, component) {}
+withPipeline(type, product, component) {
+
+    enableSlackNotifications('#opal-builds')
+
+}
