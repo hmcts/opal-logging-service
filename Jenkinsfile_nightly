@@ -11,4 +11,10 @@ def type = "java"
 def product = "opal"
 def component = "logging-service"
 
-withNightlyPipeline(type, product, component) {}
+withNightlyPipeline(type, product, component) {
+
+    onMaster {
+        enableSlackNotifications('#opal-nightly-builds')
+    }
+
+}
