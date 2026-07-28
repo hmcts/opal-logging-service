@@ -5,6 +5,7 @@ import jakarta.jms.Queue;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import tools.jackson.databind.cfg.DateTimeFeature;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest.CategoryEnum;
 import uk.gov.hmcts.opal.logging.generated.dto.ParticipantIdentifier;
-import uk.gov.hmcts.opal.logging.messaging.PdpoQueueMessage;
 
 /**
  * Manual helper that publishes a PDPL message to a queue for developer testing.
@@ -57,7 +57,17 @@ class PdplQueueConnectivityIntegrationTest {
             .category(CategoryEnum.COLLECTION)
             .individuals(List.of(new ParticipantIdentifier().id("person-1").type("DEFENDANT")));
 
-        String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("PDPO", request));
+        String payload = objectMapper.writeValueAsString(Map.of(
+            "log_type", "PDPO",
+            "details", Map.of(
+                "created_by", Map.of("id", request.getCreatedBy().getId(), "type", request.getCreatedBy().getType()),
+                "business_identifier", request.getBusinessIdentifier(),
+                "created_at", request.getCreatedAt(),
+                "ip_address", request.getIpAddress(),
+                "category", "Collection",
+                "individuals", Map.of("DEFENDANT", List.of("person-1"))
+            )
+        ));
 
         try (JMSContext context = connectionFactory.createContext(JMSContext.AUTO_ACKNOWLEDGE)) {
             Queue queue = context.createQueue(queueName);

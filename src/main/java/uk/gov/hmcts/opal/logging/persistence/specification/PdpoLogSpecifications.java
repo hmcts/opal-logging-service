@@ -2,10 +2,9 @@ package uk.gov.hmcts.opal.logging.persistence.specification;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Optional;
-
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.opal.logging.domain.PdpoCategory;
@@ -23,8 +22,9 @@ public class PdpoLogSpecifications extends EntitySpecs<PdpoLogEntity> {
         return Specification.allOf(specificationList(
             createdByFilter(criteria),
             notBlank(criteria.businessIdentifier()).map(PdpoLogSpecifications::businessIdentifier),
-            notBlank(criteria.individualIdentifier()).map(PdpoLogSpecifications::individualIdentifier),
-            notNull(criteria.category()).map(PdpoLogSpecifications::category)));
+            individualFilterFromCriteria(criteria),
+            notNull(criteria.category()).map(PdpoLogSpecifications::category),
+            notNull(criteria.createdAfter()).map(PdpoLogSpecifications::createdAfter)));
     }
 
     private Optional<Specification<PdpoLogEntity>> createdByFilter(PdpoLogSearchCriteria criteria) {
@@ -46,20 +46,28 @@ public class PdpoLogSpecifications extends EntitySpecs<PdpoLogEntity> {
         };
     }
 
-    private static Specification<PdpoLogEntity> individualIdentifier(String individualId) {
+    private static Optional<Specification<PdpoLogEntity>> individualFilterFromCriteria(PdpoLogSearchCriteria criteria) {
+        return notBlank(criteria.individualIdentifier())
+            .flatMap(individualIdentifier -> notBlank(criteria.individualType())
+                .map(individualType -> individualFilterForIdentifierAndType(individualIdentifier, individualType)));
+    }
+
+    private static Specification<PdpoLogEntity> individualFilterForIdentifierAndType(
+        String individualIdentifier, String individualType) {
         return (root, query, cb) -> {
             query.distinct(true);
 
-            Subquery<Long> subquery = query.subquery(Long.class);
-            Root<PdpoLogEntity> correlatedRoot = subquery.correlate(root);
-            Join<PdpoLogEntity, PdpoLogIndividualEntity> individuals =
-                correlatedRoot.join("individuals", JoinType.INNER);
-
-            subquery.select(correlatedRoot.get("id"))
-                .where(cb.equal(individuals.get("individualIdentifier"), individualId));
-
-            return cb.exists(subquery);
+            Join<PdpoLogEntity, PdpoLogIndividualEntity> individuals = root.join("individuals", JoinType.INNER);
+            return cb.and(
+                cb.equal(individuals.get("individualIdentifier"), individualIdentifier),
+                cb.equal(individuals.get("individualType"), individualType));
         };
+    }
+
+    private static Specification<PdpoLogEntity> createdAfter(LocalDate createdAfter) {
+        return (root, query, cb) -> cb.greaterThan(
+            root.get("createdAt"),
+            createdAfter.atStartOfDay().atOffset(ZoneOffset.UTC));
     }
 
     private static Specification<PdpoLogEntity> category(PdpoCategory category) {

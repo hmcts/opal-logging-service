@@ -12,15 +12,19 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest;
 import uk.gov.hmcts.opal.logging.generated.dto.AddPdpoLogRequest.CategoryEnum;
@@ -190,6 +194,18 @@ class PersonalDataProcessingLogServiceImplTest {
         verifyNoInteractions(logRepository);
     }
 
+    @ParameterizedTest
+    @MethodSource("individualIdentifierAndTypeMismatchCases")
+    void searchLogs_requiresIndividualIdentifierAndTypeTogether(
+        SearchPdpoLogRequest request) {
+
+        assertThatThrownBy(() -> service.searchLogs(request))
+            .isInstanceOf(ResponseStatusException.class)
+            .hasMessageContaining(
+                "IndividualIdentifier and individualType must either both be provided or both be omitted");
+        verifyNoInteractions(logRepository);
+    }
+
     @Test
     void searchLogs_delegatesToRepository() {
         PdpoLogEntity entity = PdpoLogEntity.builder()
@@ -209,6 +225,13 @@ class PersonalDataProcessingLogServiceImplTest {
         verify(logRepository).findAll(
             org.mockito.ArgumentMatchers.<org.springframework.data.jpa.domain.Specification<PdpoLogEntity>>any(),
             any(Sort.class));
+    }
+
+    private static Stream<Arguments> individualIdentifierAndTypeMismatchCases() {
+        return Stream.of(
+            Arguments.of(new SearchPdpoLogRequest().individualIdentifier("subject-1")),
+            Arguments.of(new SearchPdpoLogRequest().individualType("DEFENDANT"))
+        );
     }
 
     private AddPdpoLogRequest minimalDetails() {

@@ -1,11 +1,12 @@
 package uk.gov.hmcts.opal.logging.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -163,9 +164,17 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
             }
         }
 
+        String individualId = normalizedOrNull(request.getIndividualIdentifier());
+        String individualType = normalizedOrNull(request.getIndividualType());
+
+        if ((individualId == null) != (individualType == null)) {
+            throw badRequest("IndividualIdentifier and individualType must either both be provided or both be omitted");
+        }
+
+        LocalDate createdAfter = request.getCreatedAfter();
         String businessIdentifier = normalizedOrNull(request.getBusinessIdentifier());
-        String individualId = normalizedOrNull(request.getIndividualId());
-        if (createdByIdentifier == null && businessIdentifier == null && individualId == null) {
+        if (createdByIdentifier == null && businessIdentifier == null && individualId == null
+            && request.getCreatedAfter() == null) {
             throw badRequest("At least one search parameter must be provided");
         }
 
@@ -175,7 +184,7 @@ public class PersonalDataProcessingLogServiceImpl implements PersonalDataProcess
         }
 
         return new PdpoLogSearchCriteria(createdByIdentifier, createdByType,
-                                         businessIdentifier, individualId, category);
+            businessIdentifier, individualId, individualType, category, createdAfter);
     }
 
     private ResponseStatusException badRequest(String message) {

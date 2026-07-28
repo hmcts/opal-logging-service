@@ -59,9 +59,11 @@ spring:
     properties:
       hibernate:
         jdbc:
+          batch_size: 50
           lob:
             # silence the 'wall-of-text' - unnecessary exception throw about blob types
             non_contextual_creation: true
+        order_inserts: true
   flyway:
     url: ${spring.datasource.url}
     user: ${spring.datasource.username}
