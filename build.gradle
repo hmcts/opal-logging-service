@@ -188,7 +188,7 @@ dependencyUpdates {
 
 dependencyManagement {
   imports {
-    mavenBom "io.netty:netty-bom:4.2.16.Final"
+    mavenBom "io.netty:netty-bom:4.2.17.Final"
     mavenBom "com.fasterxml.jackson:jackson-bom:2.22.1"
   }
 }
