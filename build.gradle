@@ -193,7 +193,7 @@ dependencyUpdates {
 dependencyManagement {
   imports {
     mavenBom "io.netty:netty-bom:4.2.17.Final"
-    mavenBom "com.fasterxml.jackson:jackson-bom:2.22.1"
+    mavenBom "com.fasterxml.jackson:jackson-bom:2.22.2"
   }
 }
 
@@ -227,7 +227,7 @@ dependencies {
   openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.46"
   openapiImplementation "io.swagger.core.v3:swagger-models:2.2.53"
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.53"
-  openapiImplementation "tools.jackson.dataformat:jackson-dataformat-yaml:3.2.1"
+  openapiImplementation "tools.jackson.dataformat:jackson-dataformat-yaml:3.2.2"
   openapiImplementation "org.mozilla:rhino:1.9.1"
 
   implementation('uk.gov.hmcts:opal-common-lib:0.3.25') {
