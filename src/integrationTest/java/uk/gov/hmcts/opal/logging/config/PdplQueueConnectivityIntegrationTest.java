@@ -55,7 +55,7 @@ class PdplQueueConnectivityIntegrationTest {
             .createdAt(OffsetDateTime.now(ZoneOffset.UTC))
             .ipAddress("10.10.10.10")
             .category(CategoryEnum.COLLECTION)
-            .individuals(List.of(new ParticipantIdentifier().id("person-1").type("DEFENDANT")));
+            .individuals(List.of(new ParticipantIdentifier().id("person-1").type("DEFENDANT_ACCOUNT")));
 
         String payload = objectMapper.writeValueAsString(Map.of(
             "log_type", "PDPO",
@@ -65,7 +65,7 @@ class PdplQueueConnectivityIntegrationTest {
                 "created_at", request.getCreatedAt(),
                 "ip_address", request.getIpAddress(),
                 "category", "Collection",
-                "individuals", Map.of("DEFENDANT", List.of("person-1"))
+                "individuals", Map.of("DEFENDANT_ACCOUNT", List.of("person-1"))
             )
         ));
 
