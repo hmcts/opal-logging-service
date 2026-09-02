@@ -10,7 +10,7 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.springframework.boot' version '4.1.1'
-  id 'com.github.ben-manes.versions' version '0.61.0'
+  id 'io.github.ben-manes.versions' version '0.61.0'
   id 'org.sonarqube' version '7.4.0.8496'
   id 'org.flywaydb.flyway' version '13.4.0'
   /*
@@ -214,12 +214,10 @@ ext {
   log4JVersion = "2.26.1"
   logbackVersion = "1.6.3"
   nettyVersion = "4.1.132.Final"
-  set('spring-framework.version', "7.0.8")
+  set('spring-framework.version', "7.0.9")
 }
 
-// Tomcat 11.0.24 fixes CVE-2026-53404, CVE-2026-55956, CVE-2026-55955,
-// CVE-2026-50229, CVE-2026-55276, and CVE-2026-53434.
-ext['tomcat.version'] = '11.0.24'
+ext['tomcat.version'] = '11.0.25'
 ext['snakeyaml.version'] = '2.0'
 ext['postgresql.version'] = '42.7.13'
 
