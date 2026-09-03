@@ -27,14 +27,15 @@
     <cpe>cpe:2.3:a:validator:validator:*:*:*:*:*:*:*:*</cpe>
     <cve>CVE-2025-15104</cve>
   </suppress>
-  <suppress until="2026-08-31Z">
+  <suppress until="2026-12-10Z">
     <notes><![CDATA[
-    Reviewed 2026-05-22.
+    Reviewed 2026-09-02.
     CVE-2025-21199 applies to Microsoft Azure Agent Installer products under the CPE family
     cpe:2.3:a:microsoft:azure_agent:* and the NVD affected-software entries are for the "backup"
     and "site_recovery" products. This repo contains the Java libraries
     com.microsoft.azure:applicationinsights-core and com.microsoft.azure:applicationinsights-web,
     which are being mapped to the generic azure_agent CPE by Dependency-Check.
+    No newer com.microsoft.azure:applicationinsights-web release is currently available beyond 3.7.9.
     Keep this suppression only for that false-positive CPE match.
     ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/applicationinsights\-(core|web)@.*$</packageUrl>
@@ -66,19 +67,6 @@
     <cve>CVE-2026-44891</cve>
     <cve>CVE-2026-55831</cve>
     <cve>CVE-2026-55833</cve>
-  </suppress>
-  <suppress until="2026-10-31Z">
-    <notes><![CDATA[
-    Reviewed 2026-08-10.
-    CVE-2026-66299 is a Low severity DoS in the Tomcat WebSocket chat example.
-    Apache lists the fix under Tomcat 11.0.25, but that release is not currently
-    available in Maven Central. This service embeds Tomcat and does not ship
-    Tomcat's examples web application, so the vulnerable example is not part of
-    the deployed application. Keep this suppression only for Tomcat 11.0.24
-    embed artifacts until a released Tomcat 11.0.25 or later is available.
-    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-(core|websocket)@11\.0\.24$</packageUrl>
-    <cve>CVE-2026-66299</cve>
   </suppress>
   <suppress until="2026-09-15Z">
     <notes><![CDATA[
