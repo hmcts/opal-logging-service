@@ -125,7 +125,7 @@ components:
           type: string
           minLength: 1
           maxLength: 30
-          description: Type of identifier. Examples - OPAL_USER_ID, EXTERNAL_SERVICE, DEFENDANT, MINOR_CREDITOR.
+          description: Type of identifier. Examples - OPAL_USER_ID, EXTERNAL_SYSTEM, DEFENDANT_ACCOUNT, PARENT_GUARDIAN.
 
     AddPdpoLogResponse:
       x-java-class-name: AddPdpoLogResponse
@@ -260,7 +260,7 @@ components:
           type: string
           minLength: 1
           maxLength: 30
-          description: Type of identifier. Examples - OPAL_USER_ID, EXTERNAL_SERVICE, DEFENDANT, MINOR_CREDITOR.
+          description: Type of identifier. Examples - OPAL_USER_ID, EXTERNAL_SYSTEM, DEFENDANT_ACCOUNT, PARENT_GUARDIAN.
         category:
           type: string
           enum:

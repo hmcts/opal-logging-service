@@ -70,8 +70,8 @@ class PersonalDataProcessingLogControllerTest {
             .createdAt(OffsetDateTime.parse("2025-11-15T12:45:00Z"))
             .ipAddress("192.168.1.10")
             .category(AddPdpoLogRequest.CategoryEnum.DISCLOSURE)
-            .recipient(new ParticipantIdentifier().id("recipient-42").type("EXTERNAL_SERVICE"))
-            .addIndividualsItem(new ParticipantIdentifier().id("person-1").type("DEFENDANT"));
+            .recipient(new ParticipantIdentifier().id("recipient-42").type("EXTERNAL_SYSTEM"))
+            .addIndividualsItem(new ParticipantIdentifier().id("person-1").type("DEFENDANT_ACCOUNT"));
     }
 
     private PdpoLogEntity persistedLog() {
@@ -88,13 +88,13 @@ class PersonalDataProcessingLogControllerTest {
             .ipAddress("192.168.1.10")
             .category(PdpoCategory.DISCLOSURE)
             .recipientIdentifier("recipient-42")
-            .recipientIdentifierType("EXTERNAL_SERVICE")
+            .recipientIdentifierType("EXTERNAL_SYSTEM")
             .businessIdentifier(identifier)
             .build();
 
         log.addIndividual(PdpoLogIndividualEntity.builder()
                               .individualIdentifier("person-1")
-                              .individualType("DEFENDANT")
+                              .individualType("DEFENDANT_ACCOUNT")
                               .build());
 
         return log;

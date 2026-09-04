@@ -42,8 +42,8 @@ class TestSupportPdpLogControllerIntegrationTest extends AbstractIntegrationTest
     @Test
     void searchByCreatedByReturnsMatchingLogs() throws Exception {
         persistLog("requestor-1", "OPAL_USER_ID", "BRIDGE",
-            PdpoCategory.DISCLOSURE, "recipient-1", "EXTERNAL_SERVICE");
-        persistLog("requestor-2", "EXTERNAL_SERVICE", "BRIDGE",
+            PdpoCategory.DISCLOSURE, "recipient-1", "EXTERNAL_SYSTEM");
+        persistLog("requestor-2", "EXTERNAL_SYSTEM", "BRIDGE",
             PdpoCategory.COLLECTION, null, null);
 
         SearchPdpoLogRequest request = new SearchPdpoLogRequest()
@@ -67,7 +67,7 @@ class TestSupportPdpLogControllerIntegrationTest extends AbstractIntegrationTest
 
     @Test
     void searchByBusinessIdentifierReturnsSortedLogs() throws Exception {
-        persistLog("requestor-2", "EXTERNAL_SERVICE", "SHARING",
+        persistLog("requestor-2", "EXTERNAL_SYSTEM", "SHARING",
             PdpoCategory.COLLECTION, null, null,
             OffsetDateTime.parse("2025-11-15T10:00:00Z"), "subject-1");
         persistLog("requestor-1", "OPAL_USER_ID", "SHARING",
@@ -91,7 +91,7 @@ class TestSupportPdpLogControllerIntegrationTest extends AbstractIntegrationTest
 
     @Test
     void searchByIndividualIdAndTypeReturnsSortedLogs() throws Exception {
-        persistLog("requestor-2", "EXTERNAL_SERVICE", "SHARING",
+        persistLog("requestor-2", "EXTERNAL_SYSTEM", "SHARING",
                    PdpoCategory.COLLECTION, null, null,
                    OffsetDateTime.parse("2025-11-15T10:00:00Z"), "subject-1");
         persistLog("requestor-1", "OPAL_USER_ID", "SHARING",
@@ -103,7 +103,7 @@ class TestSupportPdpLogControllerIntegrationTest extends AbstractIntegrationTest
 
         SearchPdpoLogRequest request = new SearchPdpoLogRequest()
             .individualIdentifier("subject-1")
-            .individualType("DEFENDANT");
+            .individualType("DEFENDANT_ACCOUNT");
 
         MvcResult result = mockMvc
             .perform(post("/test-support/search").contentType(APPLICATION_JSON_VALUE)
@@ -193,7 +193,7 @@ class TestSupportPdpLogControllerIntegrationTest extends AbstractIntegrationTest
 
         log.addIndividual(PdpoLogIndividualEntity.builder()
             .individualIdentifier(individualId)
-            .individualType("DEFENDANT")
+            .individualType("DEFENDANT_ACCOUNT")
             .build());
 
         logRepository.save(log);

@@ -91,8 +91,8 @@ class PersonalDataProcessingLogServiceImplTest {
             PdpoIdentifierEntity.builder().id(42L).businessIdentifier("ACME").build()
         );
 
-        ParticipantIdentifier first = identifier("ind-1", "DEFENDANT");
-        ParticipantIdentifier second = identifier("ind-2", "MINOR_CREDITOR");
+        ParticipantIdentifier first = identifier("ind-1", "DEFENDANT_ACCOUNT");
+        ParticipantIdentifier second = identifier("ind-2", "PARENT_GUARDIAN");
 
         service.recordLog(minimalDetails()
             .businessIdentifier("ACME")
@@ -230,7 +230,7 @@ class PersonalDataProcessingLogServiceImplTest {
     private static Stream<Arguments> individualIdentifierAndTypeMismatchCases() {
         return Stream.of(
             Arguments.of(new SearchPdpoLogRequest().individualIdentifier("subject-1")),
-            Arguments.of(new SearchPdpoLogRequest().individualType("DEFENDANT"))
+            Arguments.of(new SearchPdpoLogRequest().individualType("DEFENDANT_ACCOUNT"))
         );
     }
 
