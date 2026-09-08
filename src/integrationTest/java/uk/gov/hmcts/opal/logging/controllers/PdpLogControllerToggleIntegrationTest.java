@@ -49,6 +49,6 @@ class PdpLogControllerToggleIntegrationTest extends AbstractIntegrationTest {
             .createdAt(OffsetDateTime.parse("2025-11-15T12:45:00Z"))
             .ipAddress("192.168.1.10")
             .category(CategoryEnum.COLLECTION)
-            .addIndividualsItem(new ParticipantIdentifier().id("person-1").type("DEFENDANT"));
+            .addIndividualsItem(new ParticipantIdentifier().id("person-1").type("DEFENDANT_ACCOUNT"));
     }
 }

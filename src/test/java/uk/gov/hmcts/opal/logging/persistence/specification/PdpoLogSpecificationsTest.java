@@ -59,7 +59,7 @@ class PdpoLogSpecificationsTest {
     @Test
     void findBySearchCriteriaFiltersByCreatedByPair() {
         persistLog("user-1", "OPAL_USER_ID", "ACC-1", PdpoCategory.DISCLOSURE);
-        persistLog("user-2", "EXTERNAL_SERVICE", "ACC-1", PdpoCategory.DISCLOSURE);
+        persistLog("user-2", "EXTERNAL_SYSTEM", "ACC-1", PdpoCategory.DISCLOSURE);
 
         PdpoLogSearchCriteria criteria = new PdpoLogSearchCriteria(
             "user-1",
@@ -108,16 +108,16 @@ class PdpoLogSpecificationsTest {
 
     @Test
     void findBySearchCriteriaFiltersByIndividualIdentifierAndType() {
-        persistIndividualLog("user-1", "OPAL_USER_ID", "person-1", "DEFENDANT");
-        persistIndividualLog("user-2", "OPAL_USER_ID", "person-1", "MINOR_CREDITOR");
-        persistIndividualLog("user-3", "OPAL_USER_ID", "person-2", "DEFENDANT");
+        persistIndividualLog("user-1", "OPAL_USER_ID", "person-1", "DEFENDANT_ACCOUNT");
+        persistIndividualLog("user-2", "OPAL_USER_ID", "person-1", "PARENT_GUARDIAN");
+        persistIndividualLog("user-3", "OPAL_USER_ID", "person-2", "DEFENDANT_ACCOUNT");
 
         PdpoLogSearchCriteria criteria = new PdpoLogSearchCriteria(
             null,
             null,
             null,
             "person-1",
-            "DEFENDANT",
+            "DEFENDANT_ACCOUNT",
             null,
             null
         );

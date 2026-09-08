@@ -16,6 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnTransformer;
 
 @Entity
 @Table(name = "pdpo_log_individuals")
@@ -37,6 +38,10 @@ public class PdpoLogIndividualEntity {
     @Column(name = "individual_identifier", nullable = false, length = 50)
     private String individualIdentifier;
 
+    @ColumnTransformer(
+        read = "individual_type::text",
+        write = "?::t_pdpo_identifier_individual_type_enum"
+    )
     @Column(name = "individual_type", nullable = false, length = 30)
     private String individualType;
 

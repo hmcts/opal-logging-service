@@ -33,12 +33,12 @@ class PersonalDataProcessingLogMapperTest {
             .ipAddress("192.168.1.10")
             .category(PdpoCategory.DISCLOSURE)
             .recipientIdentifier("recipient-42")
-            .recipientIdentifierType("EXTERNAL_SERVICE")
+            .recipientIdentifierType("EXTERNAL_SYSTEM")
             .businessIdentifier(identifier)
             .build();
         entity.addIndividual(PdpoLogIndividualEntity.builder()
                                  .individualIdentifier("person-1")
-                                 .individualType("DEFENDANT")
+                                 .individualType("DEFENDANT_ACCOUNT")
                                  .build());
 
         AddPdpoLogResponse dto = mapper.toDto(entity);
@@ -49,7 +49,7 @@ class PersonalDataProcessingLogMapperTest {
         assertThat(dto.getCreatedBy().getId()).isEqualTo("requestor-1");
         assertThat(dto.getCreatedBy().getType()).isEqualTo("OPAL_USER_ID");
         assertThat(dto.getRecipient().getId()).isEqualTo("recipient-42");
-        assertThat(dto.getRecipient().getType()).isEqualTo("EXTERNAL_SERVICE");
+        assertThat(dto.getRecipient().getType()).isEqualTo("EXTERNAL_SYSTEM");
         assertThat(dto.getCategory()).isEqualTo(AddPdpoLogResponse.CategoryEnum.DISCLOSURE);
         assertThat(dto.getIndividuals()).hasSize(1);
         assertThat(dto.getIndividuals().get(0).getId()).isEqualTo("person-1");

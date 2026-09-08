@@ -63,7 +63,7 @@ class PdpLogControllerIntegrationTest extends AbstractIntegrationTest {
             .createdAt(OffsetDateTime.parse("2025-11-15T12:45:00Z"))
             .ipAddress("192.168.1.10")
             .category(CategoryEnum.DISCLOSURE)
-            .recipient(new ParticipantIdentifier().id("recipient-42").type("EXTERNAL_SERVICE"))
-            .addIndividualsItem(new ParticipantIdentifier().id("person-1").type("DEFENDANT"));
+            .recipient(new ParticipantIdentifier().id("recipient-42").type("EXTERNAL_SYSTEM"))
+            .addIndividualsItem(new ParticipantIdentifier().id("person-1").type("DEFENDANT_ACCOUNT"));
     }
 }
