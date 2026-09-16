@@ -38,7 +38,7 @@ class PdpoQueueConsumerImplTest {
             .businessIdentifier("ACME")
             .ipAddress("10.0.0.1")
             .category(CategoryEnum.COLLECTION)
-            .individuals(List.of(new ParticipantIdentifier().id("ind-1").type("DEFENDANT")));
+            .individuals(List.of(new ParticipantIdentifier().id("ind-1").type("DEFENDANT_ACCOUNT")));
 
         String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("PDPO", queueDetails(details)));
 
@@ -61,7 +61,7 @@ class PdpoQueueConsumerImplTest {
             .businessIdentifier("ACME")
             .ipAddress("10.0.0.1")
             .category(CategoryEnum.COLLECTION)
-            .individuals(List.of(new ParticipantIdentifier().id("ind-1").type("DEFENDANT")));
+            .individuals(List.of(new ParticipantIdentifier().id("ind-1").type("DEFENDANT_ACCOUNT")));
 
         String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("OTHER", queueDetails(details)));
 
@@ -128,8 +128,8 @@ class PdpoQueueConsumerImplTest {
                 "ip_address": "10.0.0.1",
                 "category": "Collection",
                 "individuals": {
-                  "DEFENDANT": ["ind-1", "ind-2"],
-                  "MINOR_CREDITOR": ["ind-3"]
+                  "DEFENDANT_ACCOUNT": ["ind-1", "ind-2"],
+                  "PARENT_GUARDIAN": ["ind-3"]
                 }
               }
             }
@@ -141,9 +141,9 @@ class PdpoQueueConsumerImplTest {
         verify(logService).recordLog(captor.capture());
         AddPdpoLogRequest captured = captor.getValue();
         assertThat(captured.getIndividuals()).containsExactly(
-            new ParticipantIdentifier().id("ind-1").type("DEFENDANT"),
-            new ParticipantIdentifier().id("ind-2").type("DEFENDANT"),
-            new ParticipantIdentifier().id("ind-3").type("MINOR_CREDITOR")
+            new ParticipantIdentifier().id("ind-1").type("DEFENDANT_ACCOUNT"),
+            new ParticipantIdentifier().id("ind-2").type("DEFENDANT_ACCOUNT"),
+            new ParticipantIdentifier().id("ind-3").type("PARENT_GUARDIAN")
         );
         assertThat(captured.getBusinessIdentifier()).isEqualTo("ACME");
     }
@@ -166,7 +166,7 @@ class PdpoQueueConsumerImplTest {
                 "ip_address": "10.0.0.1",
                 "category": "Collection",
                 "individuals": {
-                  "DEFENDANT": "ind-1"
+                  "DEFENDANT_ACCOUNT": "ind-1"
                 }
               }
             }

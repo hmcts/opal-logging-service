@@ -30,8 +30,8 @@ class PdpoQueueMessageMapperTest {
     @Test
     void toAddPdpoLogRequestMapsAllFieldsFromLegacyIndividuals() {
         JsonNode individuals = jsonMapper.valueToTree(List.of(
-            Map.of("id", "ind-1", "type", "DEFENDANT"),
-            Map.of("id", "ind-2", "type", "MINOR_CREDITOR")));
+            Map.of("id", "ind-1", "type", "DEFENDANT_ACCOUNT"),
+            Map.of("id", "ind-2", "type", "PARENT_GUARDIAN")));
 
         AddPdpoLogRequest request = queueMessageMapper.toAddPdpoLogRequest(queueDetails(individuals));
 
@@ -41,26 +41,26 @@ class PdpoQueueMessageMapperTest {
         assertThat(request.getIpAddress()).isEqualTo("10.0.0.1");
         assertThat(request.getCategory()).isEqualTo(CategoryEnum.COLLECTION);
         assertThat(request.getRecipient())
-            .isEqualTo(new ParticipantIdentifier().id("service-1").type("EXTERNAL_SERVICE"));
+            .isEqualTo(new ParticipantIdentifier().id("service-1").type("EXTERNAL_SYSTEM"));
         assertThat(request.getIndividuals()).containsExactly(
-            new ParticipantIdentifier().id("ind-1").type("DEFENDANT"),
-            new ParticipantIdentifier().id("ind-2").type("MINOR_CREDITOR")
+            new ParticipantIdentifier().id("ind-1").type("DEFENDANT_ACCOUNT"),
+            new ParticipantIdentifier().id("ind-2").type("PARENT_GUARDIAN")
         );
     }
 
     @Test
     void toAddPdpoLogRequestMapsCompactIndividuals() {
         Map<String, Object> compactIndividuals = new LinkedHashMap<>();
-        compactIndividuals.put("DEFENDANT", List.of("ind-1", "ind-2"));
-        compactIndividuals.put("MINOR_CREDITOR", List.of("ind-3"));
+        compactIndividuals.put("DEFENDANT_ACCOUNT", List.of("ind-1", "ind-2"));
+        compactIndividuals.put("PARENT_GUARDIAN", List.of("ind-3"));
 
         AddPdpoLogRequest request = queueMessageMapper.toAddPdpoLogRequest(
             queueDetails(jsonMapper.valueToTree(compactIndividuals)));
 
         assertThat(request.getIndividuals()).containsExactly(
-            new ParticipantIdentifier().id("ind-1").type("DEFENDANT"),
-            new ParticipantIdentifier().id("ind-2").type("DEFENDANT"),
-            new ParticipantIdentifier().id("ind-3").type("MINOR_CREDITOR"));
+            new ParticipantIdentifier().id("ind-1").type("DEFENDANT_ACCOUNT"),
+            new ParticipantIdentifier().id("ind-2").type("DEFENDANT_ACCOUNT"),
+            new ParticipantIdentifier().id("ind-3").type("PARENT_GUARDIAN"));
     }
 
     @Test
@@ -73,14 +73,14 @@ class PdpoQueueMessageMapperTest {
     @Test
     void toAddPdpoLogRequestIgnoresNullCompactEntries() {
         Map<String, Object> compactIndividuals = new LinkedHashMap<>();
-        compactIndividuals.put("DEFENDANT", null);
-        compactIndividuals.put("MINOR_CREDITOR", List.of("ind-3"));
+        compactIndividuals.put("DEFENDANT_ACCOUNT", null);
+        compactIndividuals.put("PARENT_GUARDIAN", List.of("ind-3"));
 
         AddPdpoLogRequest request = queueMessageMapper.toAddPdpoLogRequest(
             queueDetails(jsonMapper.valueToTree(compactIndividuals)));
 
         assertThat(request.getIndividuals()).containsExactly(
-            new ParticipantIdentifier().id("ind-3").type("MINOR_CREDITOR"));
+            new ParticipantIdentifier().id("ind-3").type("PARENT_GUARDIAN"));
     }
 
     @Test
@@ -94,7 +94,7 @@ class PdpoQueueMessageMapperTest {
 
     @Test
     void toAddPdpoLogRequestRejectsCompactEntryThatIsNotArray() {
-        JsonNode individuals = jsonMapper.valueToTree(Map.of("DEFENDANT", "ind-1"));
+        JsonNode individuals = jsonMapper.valueToTree(Map.of("DEFENDANT_ACCOUNT", "ind-1"));
 
         assertThatThrownBy(() -> queueMessageMapper.toAddPdpoLogRequest(queueDetails(individuals)))
             .isInstanceOf(IllegalArgumentException.class)
@@ -103,7 +103,7 @@ class PdpoQueueMessageMapperTest {
 
     @Test
     void toAddPdpoLogRequestRejectsCompactIdentifierThatIsNotString() {
-        JsonNode individuals = jsonMapper.valueToTree(Map.of("DEFENDANT", List.of(NON_STRING_JSON_VALUE)));
+        JsonNode individuals = jsonMapper.valueToTree(Map.of("DEFENDANT_ACCOUNT", List.of(NON_STRING_JSON_VALUE)));
 
         assertThatThrownBy(() -> queueMessageMapper.toAddPdpoLogRequest(queueDetails(individuals)))
             .isInstanceOf(IllegalArgumentException.class)
@@ -113,7 +113,7 @@ class PdpoQueueMessageMapperTest {
     @Test
     void toAddPdpoLogRequestRejectsLegacyIdThatIsNotString() {
         JsonNode individuals = jsonMapper.valueToTree(List.of(Map.of("id", NON_STRING_JSON_VALUE, "type",
-            "DEFENDANT")));
+            "DEFENDANT_ACCOUNT")));
 
         assertThatThrownBy(() -> queueMessageMapper.toAddPdpoLogRequest(queueDetails(individuals)))
             .isInstanceOf(IllegalArgumentException.class)
@@ -136,7 +136,7 @@ class PdpoQueueMessageMapperTest {
         queueDetails.setBusinessIdentifier("ACME");
         queueDetails.setIpAddress("10.0.0.1");
         queueDetails.setCategory(CategoryEnum.COLLECTION);
-        queueDetails.setRecipient(new ParticipantIdentifier().id("service-1").type("EXTERNAL_SERVICE"));
+        queueDetails.setRecipient(new ParticipantIdentifier().id("service-1").type("EXTERNAL_SYSTEM"));
         queueDetails.setIndividuals(individuals);
         return queueDetails;
     }

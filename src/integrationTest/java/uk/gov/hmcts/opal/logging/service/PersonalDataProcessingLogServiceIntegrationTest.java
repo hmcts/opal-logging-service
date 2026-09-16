@@ -47,12 +47,15 @@ class PersonalDataProcessingLogServiceIntegrationTest extends AbstractIntegratio
     @Test
     @Transactional
     void persistsDisclosureRecipientAndIndividuals() {
-        ParticipantIdentifier recipient = participant("recipient-42", "EXTERNAL_SERVICE");
+        ParticipantIdentifier recipient = participant("recipient-42", "EXTERNAL_SYSTEM");
 
         AddPdpoLogRequest request = baseRequest()
             .category(CategoryEnum.DISCLOSURE)
             .recipient(recipient)
-            .individuals(List.of(participant("person-1", "DEFENDANT"), participant("person-2", "MINOR_CREDITOR")));
+            .individuals(List.of(
+                participant("person-1", "DEFENDANT_ACCOUNT"),
+                participant("person-2", "PARENT_GUARDIAN")
+            ));
 
         PdpoLogEntity persisted = service.recordLog(request);
         PdpoLogEntity fromDb = logRepository.findById(persisted.getId()).orElseThrow();
@@ -80,7 +83,7 @@ class PersonalDataProcessingLogServiceIntegrationTest extends AbstractIntegratio
             .createdAt(OffsetDateTime.parse("2025-11-15T12:45:00Z"))
             .ipAddress("192.168.1.10")
             .category(CategoryEnum.COLLECTION)
-            .individuals(new ArrayList<>(List.of(participant("person-1", "DEFENDANT"))));
+            .individuals(new ArrayList<>(List.of(participant("person-1", "DEFENDANT_ACCOUNT"))));
     }
 
     private ParticipantIdentifier participant(String identifier, String type) {

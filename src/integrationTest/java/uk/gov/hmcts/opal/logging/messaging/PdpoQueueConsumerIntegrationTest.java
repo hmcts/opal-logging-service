@@ -42,7 +42,7 @@ class PdpoQueueConsumerIntegrationTest extends AbstractIntegrationTest {
             .createdAt(OffsetDateTime.parse("2025-11-19T14:05:00Z"))
             .ipAddress("10.10.10.10")
             .category(CategoryEnum.COLLECTION)
-            .individuals(List.of(new ParticipantIdentifier().id("person-1").type("DEFENDANT")));
+            .individuals(List.of(new ParticipantIdentifier().id("person-1").type("DEFENDANT_ACCOUNT")));
 
         String payload = objectMapper.writeValueAsString(new PdpoQueueMessage("PDPO", queueDetails(request)));
 
@@ -68,9 +68,9 @@ class PdpoQueueConsumerIntegrationTest extends AbstractIntegrationTest {
         assertThat(persisted.getIndividuals())
             .extracting("individualType", "individualIdentifier")
             .containsExactlyInAnyOrder(
-                org.assertj.core.groups.Tuple.tuple("DEFENDANT", "person-1"),
-                org.assertj.core.groups.Tuple.tuple("DEFENDANT", "person-2"),
-                org.assertj.core.groups.Tuple.tuple("MINOR_CREDITOR", "person-3")
+                org.assertj.core.groups.Tuple.tuple("DEFENDANT_ACCOUNT", "person-1"),
+                org.assertj.core.groups.Tuple.tuple("DEFENDANT_ACCOUNT", "person-2"),
+                org.assertj.core.groups.Tuple.tuple("PARENT_GUARDIAN", "person-3")
             );
     }
 
@@ -96,7 +96,7 @@ class PdpoQueueConsumerIntegrationTest extends AbstractIntegrationTest {
                 "ip_address", "10.10.10.10",
                 "category", "Collection",
                 "individuals", Map.of(
-                    "DEFENDANT", List.of("person-1", "person-2"),
-                    "MINOR_CREDITOR", List.of("person-3")))));
+                    "DEFENDANT_ACCOUNT", List.of("person-1", "person-2"),
+                    "PARENT_GUARDIAN", List.of("person-3")))));
     }
 }

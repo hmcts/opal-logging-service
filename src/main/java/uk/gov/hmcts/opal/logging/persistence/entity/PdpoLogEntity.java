@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 import org.hibernate.dialect.type.PostgreSQLInetJdbcType;
@@ -48,6 +49,10 @@ public class PdpoLogEntity {
     @Column(name = "created_by_identifier", nullable = false, length = 50)
     private String createdByIdentifier;
 
+    @ColumnTransformer(
+        read = "created_by_identifier_type::text",
+        write = "?::t_pdpo_identifier_individual_type_enum"
+    )
     @Column(name = "created_by_identifier_type", nullable = false, length = 30)
     private String createdByIdentifierType;
 
@@ -66,6 +71,10 @@ public class PdpoLogEntity {
     @Column(name = "recipient_identifier", length = 50)
     private String recipientIdentifier;
 
+    @ColumnTransformer(
+        read = "recipient_identifier_type::text",
+        write = "?::t_pdpo_identifier_individual_type_enum"
+    )
     @Column(name = "recipient_identifier_type", length = 30)
     private String recipientIdentifierType;
 
