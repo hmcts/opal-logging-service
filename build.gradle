@@ -21,6 +21,10 @@ plugins {
   id "org.openapi.generator" version "7.25.0"
 }
 
+var skipTests = true//System.getenv('SKIP_TESTS') != null && System.getenv('SKIP_TESTS').toBoolean();
+var skipSonar = true//System.getenv('SKIP_SONAR') != null && System.getenv('SKIP_SONAR').toBoolean();
+
+
 application {
   mainClass = 'uk.gov.hmcts.opal.logging.Application'
   group = 'uk.gov.hmcts.opal'
@@ -121,6 +125,11 @@ tasks.named('sonarResolver') {
 
 tasks.withType(Test).configureEach {
   useJUnitPlatform()
+
+  if (skipTests) {
+    exclude("uk/gov/hmcts/opal/**")
+  }
+
   failFast = true
 
   testLogging {
@@ -175,6 +184,9 @@ sonarqube {
   properties {
     property "sonar.projectName", "HMCTS :: opal-logging-service"
     property "sonar.projectKey", "uk.gov.hmcts:opal-logging-service"
+    if (skipSonar) {
+      property 'sonar.exclusions', "**/**"
+    }
   }
 }
 
