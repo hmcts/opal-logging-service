@@ -1,0 +1,11 @@
+**
+
+!Dockerfile
+!build/
+build/**
+!build/libs/
+build/libs/**
+!build/libs/opal-logging-service.jar
+!lib/
+lib/**
+!lib/applicationinsights.json
