@@ -226,7 +226,7 @@ dependencies {
   openapiImplementation "io.swagger.core.v3:swagger-models:2.2.55"
   openapiImplementation "io.swagger.core.v3:swagger-core:2.2.55"
   openapiImplementation "tools.jackson.dataformat:jackson-dataformat-yaml:3.2.4"
-  openapiImplementation "org.mozilla:rhino:1.9.1"
+  openapiImplementation "org.mozilla:rhino:1.9.2"
 
   implementation('uk.gov.hmcts:opal-common-lib:0.3.38') {
     exclude group: 'com.microsoft.azure', module: 'applicationinsights-spring-boot-starter'
