@@ -223,8 +223,8 @@ ext['postgresql.version'] = '42.7.13'
 
 dependencies {
   openapiImplementation "io.swagger.parser.v3:swagger-parser:2.1.48"
-  openapiImplementation "io.swagger.core.v3:swagger-models:2.2.55"
-  openapiImplementation "io.swagger.core.v3:swagger-core:2.2.55"
+  openapiImplementation "io.swagger.core.v3:swagger-models:3.0.0"
+  openapiImplementation "io.swagger.core.v3:swagger-core:3.0.0"
   openapiImplementation "tools.jackson.dataformat:jackson-dataformat-yaml:3.2.4"
   openapiImplementation "org.mozilla:rhino:1.9.2"
 
