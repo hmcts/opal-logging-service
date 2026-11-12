@@ -19,9 +19,20 @@ if [[ -z "${TEAMS_WEBHOOK_URL:-}" ]]; then
   exit 1
 fi
 
-payload="$(jq -n --arg text "$message" '{text: $text}')"
+payload="$(jq -n --arg text "$message" '{
+  type: "message",
+  attachments: [{
+    contentType: "application/vnd.microsoft.card.adaptive",
+    content: {
+      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+      type: "AdaptiveCard",
+      version: "1.2",
+      body: [{type: "TextBlock", text: $text, wrap: true}]
+    }
+  }]
+}')"
 curl --fail-with-body --silent --show-error --retry 2 --retry-delay 2 \
   -H 'Content-Type: application/json' --data "$payload" \
   --output /dev/null "$TEAMS_WEBHOOK_URL"
 
-printf '%s\n' 'Test message sent to Teams.'
+printf '%s\n' 'Webhook accepted the test card; check the Teams workflow run and chat for delivery.'
