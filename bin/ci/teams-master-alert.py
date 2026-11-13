@@ -10,8 +10,9 @@ ones. With it false, report the first RED build and the next GREEN recovery.
 Pending builds never send a message. The status tells us the build result, not
 which Jenkins stage failed or the underlying cause.
 
-To change the Teams wording, edit the four MESSAGE templates below. Keep the
-{number}, {state} and {url} placeholders where you want those values to appear.
+To change the Teams wording, edit the four MESSAGE templates below. Card layout
+and Jenkins links are built separately, so status URLs from Jenkins can point
+to a stage page without sending people there from Teams.
 """
 
 import json
@@ -23,27 +24,26 @@ import sys
 
 REPO = "opal-logging-service"
 BASE = f"repos/hmcts/{REPO}"
+MASTER_JOB = f"https://sds-build.hmcts.net/job/HMCTS/job/{REPO}/job/master/"
 MASTER_BUILD = re.compile(
-    rf"^https://sds-build\.hmcts\.net/job/HMCTS/job/{REPO}/job/master/(\d+)(?:/|$)"
+    rf"^{re.escape(MASTER_JOB)}(\d+)(?:/|$)"
 )
 
 # Message wording lives here so the alert policy below can stay unchanged.
 # These are build results; an older overlapping build can finish after a newer one.
 EVERY_BUILD_GREEN_MESSAGE = (
-    "🟢 Opal logging master build #{number} finished SUCCESS. "
-    "Check the latest master result before routine merges.\n{url}"
+    "Build finished successfully. Check the latest master result before routine merges."
 )
 EVERY_BUILD_RED_MESSAGE = (
-    "🔴 Opal logging master build #{number} finished {state}. "
-    "Check the latest master result before routine merges.\n{url}"
+    "Build finished {state}. Check the latest master result before routine merges "
+    "and coordinate a fix."
 )
 FIRST_RED_MESSAGE = (
-    "🔴 Opal logging master is RED — Jenkins build #{number} finished {state}. "
-    "Please check master before routine merges and coordinate a fix.\n{url}"
+    "Master is RED. Please check the latest master result before routine merges "
+    "and coordinate a fix."
 )
 RECOVERY_MESSAGE = (
-    "🟢 Opal logging master recovered — Jenkins build #{number} "
-    "finished successfully.\n{url}"
+    "Master recovered. Check the latest master result before routine merges."
 )
 
 
@@ -109,8 +109,7 @@ def message_for(event_id, event_url, builds, report_all=False):
         return None
     if latest["state"] not in ("success", "failure", "error"):
         return None
-    number = MASTER_BUILD.match(event_url).group(1)
-    values = {"number": number, "state": latest["state"].upper(), "url": event_url}
+    values = {"state": latest["state"].upper()}
     if report_all:
         template = EVERY_BUILD_GREEN_MESSAGE if latest["state"] == "success" else EVERY_BUILD_RED_MESSAGE
         return template.format(**values)
@@ -121,6 +120,39 @@ def message_for(event_id, event_url, builds, report_all=False):
     if latest["state"] == "success" and was_red:
         return RECOVERY_MESSAGE.format(**values)
     return None
+
+
+def card_for(message, build):
+    """Build a Teams card with stable Jenkins destinations and status styling.
+
+    Teams chooses the actual shades for Good and Attention in each theme. The
+    source status URL may point to a stage view, so links use canonical pages.
+    """
+    number = MASTER_BUILD.match(build["target_url"]).group(1)
+    failed = build["state"] in ("failure", "error")
+    status = build["state"].upper()
+    build_url = f"{MASTER_JOB}{number}/"
+    actions = [
+        {"type": "Action.OpenUrl", "title": "Latest master", "url": MASTER_JOB},
+        {"type": "Action.OpenUrl", "title": f"Build #{number}", "url": build_url},
+    ]
+    if failed:
+        actions.append({"type": "Action.OpenUrl", "title": "Console output",
+                        "url": f"{build_url}console"})
+    return {
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "type": "AdaptiveCard",
+        "version": "1.2",
+        "body": [
+            {"type": "Container", "style": "attention" if failed else "good", "items": [
+                {"type": "TextBlock", "text": f"{'🔴' if failed else '🟢'} Logging master · #{number} · {status}",
+                 "size": "Large", "weight": "Bolder", "wrap": True},
+            ]},
+            {"type": "TextBlock", "text": message, "wrap": True, "separator": True,
+             "spacing": "Medium"},
+        ],
+        "actions": actions,
+    }
 
 
 def main():
@@ -153,12 +185,7 @@ def main():
         "type": "message",
         "attachments": [{
             "contentType": "application/vnd.microsoft.card.adaptive",
-            "content": {
-                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                "type": "AdaptiveCard",
-                "version": "1.2",
-                "body": [{"type": "TextBlock", "text": message, "wrap": True}],
-            },
+            "content": card_for(message, builds[0]),
         }],
     }
     subprocess.run(["curl", "--fail-with-body", "--silent", "--show-error",
