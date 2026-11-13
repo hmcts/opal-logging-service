@@ -66,7 +66,8 @@ class MasterAlertTest(unittest.TestCase):
     def test_previous_builds_keep_numbered_and_completed_results_separate(self):
         previous_pending = status(419, "pending", 19)
         previous_red = status(418, "failure", 18, "old")
-        commits = {"head": {"parents": [{"sha": "old"}]}, "old": {"parents": []}}
+        commits = {"head": {"sha": "head", "parents": [{"sha": "old"}]},
+                   "old": {"sha": "old", "parents": []}}
 
         def fake_api(path):
             sha = path.split("/commits/")[1].split("/")[0]
@@ -137,7 +138,9 @@ class MasterAlertTest(unittest.TestCase):
             if path.endswith("/commits/old/statuses?per_page=100"):
                 return [previous]
             if path.endswith("/commits/head"):
-                return {"parents": [{"sha": "old"}]}
+                return {"sha": "head", "parents": [{"sha": "old"}]}
+            if path.endswith("/commits/old"):
+                return {"sha": "old", "parents": []}
             if path.endswith("/commits/head/pulls?per_page=100"):
                 return associated
             if path.endswith("/pulls/346"):
