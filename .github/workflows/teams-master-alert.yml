@@ -16,6 +16,7 @@ jobs:
     if: >-
       github.run_attempt == 1 &&
       github.event.context == 'continuous-integration/jenkins/branch' &&
+      (github.event.state == 'success' || github.event.state == 'failure' || github.event.state == 'error') &&
       startsWith(github.event.target_url,
         'https://sds-build.hmcts.net/job/HMCTS/job/opal-logging-service/job/master/')
     runs-on: ubuntu-latest

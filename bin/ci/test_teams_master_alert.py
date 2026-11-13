@@ -27,13 +27,12 @@ class MasterAlertTest(unittest.TestCase):
         red = status(417, "failure", 17)
         green = status(416, "success", 16)
         message = alert.message_for(17, red["target_url"], [red, green])
-        self.assertIn("master is RED", message)
-        self.assertIn("#417", message)
-        self.assertIn("master is RED", alert.message_for(17, red["target_url"], [red]))
+        self.assertIn("Master is RED", message)
+        self.assertIn("Master is RED", alert.message_for(17, red["target_url"], [red]))
 
         recovered = status(418, "success", 18)
         message = alert.message_for(18, recovered["target_url"], [recovered, red])
-        self.assertIn("master recovered", message)
+        self.assertIn("Master recovered", message)
 
     def test_continuing_red_and_unrelated_status_are_silent(self):
         red = status(418, "error", 18)
@@ -51,10 +50,26 @@ class MasterAlertTest(unittest.TestCase):
     def test_report_all_sends_each_completed_build(self):
         green = status(418, "success", 18)
         red = status(417, "failure", 17)
-        self.assertIn("build #418 finished SUCCESS",
+        self.assertIn("Build finished successfully",
                       alert.message_for(18, green["target_url"], [green], report_all=True))
-        self.assertIn("build #417 finished FAILURE",
+        self.assertIn("Build finished FAILURE",
                       alert.message_for(17, red["target_url"], [red], report_all=True))
+
+    def test_card_uses_build_links_instead_of_jenkins_stage_url(self):
+        green = status(419, "success", 19)
+        red = status(420, "failure", 20)
+        base = alert.MASTER_JOB
+
+        green_card = alert.card_for("Build finished successfully.", green)
+        self.assertEqual("good", green_card["body"][0]["style"])
+        self.assertEqual("Large", green_card["body"][0]["items"][0]["size"])
+        self.assertEqual([base, f"{base}419/"],
+                         [action["url"] for action in green_card["actions"]])
+
+        red_card = alert.card_for("Master is RED.", red)
+        self.assertEqual("attention", red_card["body"][0]["style"])
+        self.assertEqual([base, f"{base}420/", f"{base}420/console"],
+                         [action["url"] for action in red_card["actions"]])
 
     def test_report_all_ignores_pending_and_superseded_statuses(self):
         pending = status(418, "pending", 18)
