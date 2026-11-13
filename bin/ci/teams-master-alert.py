@@ -26,6 +26,17 @@ MASTER_JOB = f"https://sds-build.hmcts.net/job/HMCTS/job/{REPO}/job/master/"
 MASTER_BUILD = re.compile(
     rf"^{re.escape(MASTER_JOB)}(\d+)(?:/|$)"
 )
+# Keys: (failed, previous completed result was RED, previous numbered build has same SHA).
+RESULT_TEXT = {
+    (False, False, True): "Rebuild remains GREEN.",
+    (False, False, False): "Master remains GREEN after new code was built.",
+    (False, True, True): "Rebuild is GREEN; master has recovered.",
+    (False, True, False): "Master is GREEN again after new code was built.",
+    (True, False, True): "Master has turned RED on unchanged code.",
+    (True, False, False): "Master has turned RED after new code was built.",
+    (True, True, True): "Rebuild remains RED.",
+    (True, True, False): "Master remains RED after new code was built.",
+}
 
 
 def api(path):
@@ -34,31 +45,37 @@ def api(path):
     return json.loads(result.stdout)
 
 
-def completed_builds():
-    """Find the latest two completed master builds, including earlier commits.
-
-    A new commit can have only a pending build, so we follow master's first
-    parents to retain the previous completed result. Build number determines
-    order: an older build may finish after a newer one. Forty commits bounds the
-    API work; if history ends sooner, we use the results found so far.
-    """
-    commit = api(f"{BASE}/commits/master")
+def build_history(ref, before=None, completed_count=2):
+    """Collect master statuses by build number across up to 40 first parents."""
+    commit = api(f"{BASE}/commits/master") if ref == "master" else {"sha": ref}
     builds = {}
     for _ in range(40):
         sha = commit["sha"]
         for status in api(f"{BASE}/commits/{sha}/statuses?per_page=100"):
-            url = status.get("target_url") or ""
-            match = MASTER_BUILD.match(url)
-            if match and status.get("context") == "continuous-integration/jenkins/branch":
-                number = int(match.group(1))
-                if number not in builds or status["id"] > builds[number]["id"]:
-                    builds[number] = status
-        completed = [builds[n] for n in sorted(builds, reverse=True)
-                     if builds[n]["state"] in ("success", "failure", "error")]
-        if len(completed) >= 2 or not commit["parents"]:
-            return completed[:2]
+            match = MASTER_BUILD.match(status.get("target_url") or "")
+            if not match or status.get("context") != "continuous-integration/jenkins/branch":
+                continue
+            number = int(match.group(1))
+            if before is not None and number >= before:
+                continue
+            if number not in builds or status["id"] > builds[number]["id"]:
+                builds[number] = {**status, "sha": sha}
+        ordered = [builds[n] for n in sorted(builds, reverse=True)]
+        completed = [build for build in ordered if build["state"] in ("success", "failure", "error")]
+        if len(completed) >= completed_count:
+            return ordered
+        if "parents" not in commit:
+            commit = api(f"{BASE}/commits/{sha}")
+        if not commit["parents"]:
+            return ordered
         commit = api(f'{BASE}/commits/{commit["parents"][0]["sha"]}')
-    return completed[:2]
+    return ordered
+
+
+def completed_builds():
+    """Find the latest two completed regular master builds."""
+    return [build for build in build_history("master")
+            if build["state"] in ("success", "failure", "error")][:2]
 
 
 def status_for_event(sha, event_id, event_url):
@@ -84,28 +101,10 @@ def previous_builds(sha, number):
     could still be pending, whereas a result comparison needs a completed one.
     Follow first parents so a new merge commit can see earlier master builds.
     """
-    builds = {}
-    for _ in range(40):
-        for status in api(f"{BASE}/commits/{sha}/statuses?per_page=100"):
-            match = MASTER_BUILD.match(status.get("target_url") or "")
-            if not match or status.get("context") != "continuous-integration/jenkins/branch":
-                continue
-            build_number = int(match.group(1))
-            if build_number >= number:
-                continue
-            if build_number not in builds or status["id"] > builds[build_number]["id"]:
-                builds[build_number] = {**status, "sha": sha}
-        ordered = [builds[n] for n in sorted(builds, reverse=True)]
-        previous_numbered = ordered[0] if ordered else None
-        previous_completed = next((build for build in ordered
-                                   if build["state"] in ("success", "failure", "error")), None)
-        if previous_numbered and previous_completed:
-            return previous_numbered, previous_completed
-        commit = api(f"{BASE}/commits/{sha}")
-        if not commit["parents"]:
-            break
-        sha = commit["parents"][0]["sha"]
-    return previous_numbered, previous_completed
+    ordered = build_history(sha, before=number, completed_count=1)
+    completed = next((build for build in ordered
+                      if build["state"] in ("success", "failure", "error")), None)
+    return (ordered[0] if ordered else None), completed
 
 
 def message_for(build, previous_numbered, previous_completed, report_all=False):
@@ -121,54 +120,26 @@ def message_for(build, previous_numbered, previous_completed, report_all=False):
                            not failed and not was_red):
         return None
     same_code = previous_numbered and build["sha"] == previous_numbered["sha"]
-    prior_pending = previous_numbered and previous_numbered["state"] == "pending"
     if failed:
-        if was_red:
-            if prior_pending:
-                result = ("Master remains RED after new code was built; the preceding build "
-                          "is still running." if new_code_since_result else
-                          "Master remains RED while the preceding build is still running.")
-            elif same_code:
-                result = "Rebuild remains RED."
-            elif previous_numbered:
-                result = "Master remains RED after new code was built."
-            else:
-                result = "Master remains RED; the previous build is unavailable."
-        elif previous_completed:
-            if prior_pending:
-                result = ("Master has turned RED after new code was built; the preceding build "
-                          "is still running." if new_code_since_result else
-                          "Master has turned RED while the preceding build is still running.")
-            elif same_code:
-                result = "Master has turned RED on unchanged code."
-            elif previous_numbered:
-                result = "Master has turned RED after new code was built."
-            else:
-                result = "Master has turned RED; the previous build is unavailable."
-        else:
-            result = "Master build is RED; the previous result is unavailable."
-        return f"{result} Check master before routine merges and coordinate investigation."
-    if was_red:
-        if prior_pending:
-            result = "Master is GREEN again while the preceding build is still running."
-        elif same_code:
-            result = "Rebuild is GREEN; master has recovered."
-        elif previous_numbered:
-            result = "Master is GREEN again after new code was built."
-        else:
-            result = "Master is GREEN again; the previous build is unavailable."
-    elif previous_completed:
-        if prior_pending:
-            result = "Master is GREEN while the preceding build is still running."
-        elif same_code:
-            result = "Rebuild remains GREEN."
-        elif previous_numbered:
-            result = "Master remains GREEN after new code was built."
-        else:
-            result = "Master remains GREEN; the previous build is unavailable."
+        state = "remains RED" if was_red else "has turned RED"
     else:
-        result = "Master build is GREEN; the previous result is unavailable."
-    return f"{result} Check the latest master result before routine merges."
+        state = "is GREEN again" if was_red else "remains GREEN"
+    if not previous_completed:
+        result = f"Master build is {'RED' if failed else 'GREEN'}; the previous result is unavailable."
+    elif not previous_numbered:
+        result = f"Master {state}; the previous build is unavailable."
+    elif previous_numbered["state"] == "pending":
+        if not failed and not was_red:
+            state = "is GREEN"
+        if failed and new_code_since_result:
+            result = f"Master {state} after new code was built; the preceding build is still running."
+        else:
+            result = f"Master {state} while the preceding build is still running."
+    else:
+        result = RESULT_TEXT[(failed, bool(was_red), bool(same_code))]
+    instruction = ("Check master before routine merges and coordinate investigation." if failed else
+                   "Check the latest master result before routine merges.")
+    return f"{result} {instruction}"
 
 
 def merged_pr_for_commit(sha):
