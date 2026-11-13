@@ -6,6 +6,7 @@ on:
 permissions:
   contents: read
   statuses: read
+  pull-requests: read
 
 concurrency:
   group: logging-master-teams-alert

@@ -9,6 +9,11 @@ on:
         required: true
         type: boolean
         default: false
+      preview_red_card:
+        description: Preview the RED card layout using successful build #420 as a sample link
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -21,5 +26,11 @@ jobs:
       - name: Preview or send the Teams test message
         env:
           SEND_TEST: ${{ inputs.send_test }}
+          PREVIEW_RED_CARD: ${{ inputs.preview_red_card }}
           TEAMS_WEBHOOK_URL: ${{ secrets.OPAL_MASTER_ALERT_TEAMS_WEBHOOK }}
-        run: bash ./bin/ci/teams-master-alert-trial.sh
+        run: |
+          if [[ "$PREVIEW_RED_CARD" == "true" ]]; then
+            python3 bin/ci/teams-master-alert.py
+          else
+            bash ./bin/ci/teams-master-alert-trial.sh
+          fi
