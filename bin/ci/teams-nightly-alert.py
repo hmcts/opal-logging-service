@@ -6,11 +6,11 @@ The Action accepts that event only for this repo's nightly master job. Regular
 master statuses use their existing two-channel Action.
 """
 
-import json
 import os
 import re
-import subprocess
 import sys
+
+from teams_card import commit_action, jenkins_actions, make_card, send_card
 
 
 NIGHTLY_JOB = "https://sds-build.hmcts.net/job/HMCTS_Nightly/job/opal-logging-service/job/master/"
@@ -26,35 +26,13 @@ RESULT_MESSAGE = {
 
 def card_for(number, result, sha):
     """Show the nightly result and direct links to that Jenkins build."""
-    needs_console = result != "SUCCESS"
     colour = "good" if result == "SUCCESS" else "attention" if result == "FAILURE" else "warning"
     icon = "🟢" if result == "SUCCESS" else "🔴" if result == "FAILURE" else "🟠"
-    build_url = f"{NIGHTLY_JOB}{number}/"
-    actions = [
-        {"type": "Action.OpenUrl", "title": "Latest nightly", "url": NIGHTLY_JOB},
-        {"type": "Action.OpenUrl", "title": f"Build #{number}", "url": build_url},
-    ]
-    if needs_console:
-        actions.append({"type": "Action.OpenUrl", "title": "Console output",
-                        "url": f"{build_url}console"})
+    actions = jenkins_actions(NIGHTLY_JOB, number, "Latest nightly", console=result != "SUCCESS")
     if sha:
-        actions.append({"type": "Action.OpenUrl", "title": f"Commit {sha[:7]}",
-                        "url": f"https://github.com/hmcts/opal-logging-service/commit/{sha}"})
-    return {
-        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-        "type": "AdaptiveCard",
-        "version": "1.2",
-        "body": [
-            {"type": "Container", "style": colour, "items": [
-                {"type": "TextBlock",
-                 "text": f"{icon} Logging Service nightly · #{number} · {result}",
-                 "size": "Large", "weight": "Bolder", "wrap": True},
-            ]},
-            {"type": "TextBlock", "text": RESULT_MESSAGE[result],
-             "wrap": True, "separator": True, "spacing": "Medium"},
-        ],
-        "actions": actions,
-    }
+        actions.append(commit_action("opal-logging-service", sha))
+    heading = f"{icon} Logging Service nightly · #{number} · {result}"
+    return make_card(heading, RESULT_MESSAGE[result], colour, actions)
 
 
 def main():
@@ -71,13 +49,7 @@ def main():
     if sha and not re.fullmatch(r"[0-9a-f]{40}", sha):
         sys.exit("Nightly build SHA is invalid.")
     card = card_for(match.group(1), result, sha)
-    payload = {"type": "message", "attachments": [
-        {"contentType": "application/vnd.microsoft.card.adaptive", "content": card},
-    ]}
-    subprocess.run(["curl", "--fail-with-body", "--silent", "--show-error",
-                    "--retry", "2", "--retry-delay", "2", "-H", "Content-Type: application/json",
-                    "--data", json.dumps(payload), "--output", "/dev/null", webhook], check=True)
-    print("Nightly card accepted by the Teams webhook; check its workflow run for delivery.")
+    send_card(card, webhook)
 
 
 if __name__ == "__main__":
