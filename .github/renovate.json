@@ -193,6 +193,20 @@
         "/.*logback.*/",
         "/.*logging.*/"
       ]
+    },
+    {
+      "description": "Keep Jackson 2 updates separate from Jackson 3 updates",
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["/^com\\.fasterxml\\.jackson(?:[.:]|$)/"],
+      "groupName": "Jackson 2",
+      "groupSlug": "jackson-2"
+    },
+    {
+      "description": "Keep Jackson 3 updates separate from Jackson 2 updates",
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["/^tools\\.jackson(?:[.:]|$)/"],
+      "groupName": "Jackson 3",
+      "groupSlug": "jackson-3"
     }
   ],
   "description": "Run Renovate out of hours only (UK time).",
